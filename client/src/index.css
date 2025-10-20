@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+@import "tailwindcss";
+
+body {
+  font-family: 'Fredoka', cursive;
+  background: linear-gradient(
+    to bottom,
+    #f8eee2 0%,   /* orange-200 */
+    #f7dece 50%,  /* midtone between 200 and 100 */
+    #FFEDD5 100%  /* orange-100 */
+  );
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  scroll-behavior: smooth;
+}
+
+
+
+  /* motion*/
+  @layer utilities {
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .animate-fade-in {
+      animation: fade-in 1s ease-in-out;
+    }
+  }
+
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px; /* Small width */
+  height: 6px; /* For horizontal scrollbars */
+}
+
+::-webkit-scrollbar-track {
+  background: #f8eee2; 
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #f59e0b, #d97706);
+  border-radius: 10px;
+  border: 2px solid #f8eee2;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #d97706, #b45309);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #f59e0b #f8eee2;
+}
