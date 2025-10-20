@@ -14,19 +14,170 @@ body {
   scroll-behavior: smooth;
 }
 
-
-
-  /* motion*/
-  @layer utilities {
-    @keyframes fade-in {
-      from { opacity: 0; }
-      to   { opacity: 1; }
+/* Preloader Animations */
+@layer utilities {
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(-25%);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
     }
-    .animate-fade-in {
-      animation: fade-in 1s ease-in-out;
+    50% {
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+  
+  @keyframes slide-in-from-top {
+    from {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes scale-in {
+    from {
+      transform: scale(0);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes typewriter {
+    from {
+      width: 0;
+    }
+    to {
+      width: 100%;
+    }
+  }
+  
+  @keyframes blink-caret {
+    from, to {
+      border-color: transparent;
+    }
+    50% {
+      border-color: #f59e0b;
+    }
+  }
+  
+  @keyframes shimmer {
+    0% {
+      background-position: -468px 0;
+    }
+    100% {
+      background-position: 468px 0;
     }
   }
 
+  /* Animation Classes */
+  .animate-fade-in {
+    animation: fade-in 1s ease-in-out;
+  }
+  
+  .animate-bounce {
+    animation: bounce 1s infinite;
+  }
+  
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .animate-spin {
+    animation: spin 3s linear infinite;
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .animate-slide-in-from-top {
+    animation: slide-in-from-top 0.8s ease-out;
+  }
+  
+  .animate-scale-in {
+    animation: scale-in 0.6s ease-out;
+  }
+  
+  .animate-typewriter {
+    animation: typewriter 3s steps(40, end), blink-caret 0.75s step-end infinite;
+  }
+  
+  .animate-shimmer {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(to right, #f8eee2 8%, #f7dece 18%, #f8eee2 33%);
+    background-size: 800px 104px;
+  }
+  
+  /* Custom animation delays */
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+  
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+  
+  .animation-delay-800 {
+    animation-delay: 800ms;
+  }
+  
+  /* Staggered animations for lists */
+  .stagger-animate > * {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fade-in 0.6s ease-out forwards;
+  }
+  
+  .stagger-animate > *:nth-child(1) { animation-delay: 0.1s; }
+  .stagger-animate > *:nth-child(2) { animation-delay: 0.2s; }
+  .stagger-animate > *:nth-child(3) { animation-delay: 0.3s; }
+  .stagger-animate > *:nth-child(4) { animation-delay: 0.4s; }
+  .stagger-animate > *:nth-child(5) { animation-delay: 0.5s; }
+  .stagger-animate > *:nth-child(6) { animation-delay: 0.6s; }
+}
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
@@ -53,4 +204,118 @@ body {
 * {
   scrollbar-width: thin;
   scrollbar-color: #f59e0b #f8eee2;
+}
+
+/* Preloader Specific Styles */
+.preloader-gradient {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+}
+
+.preloader-plate {
+  background: conic-gradient(from 0deg, #fbbf24, #f59e0b, #d97706, #f59e0b, #fbbf24);
+}
+
+/* Smooth page transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 400ms, transform 400ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Loading bar animation */
+.loading-bar {
+  background: linear-gradient(90deg, #f8eee2, #f7dece, #f8eee2);
+  background-size: 200% 100%;
+  animation: loading-bar 1.5s infinite;
+}
+
+@keyframes loading-bar {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Food icon specific animations */
+.food-bounce {
+  animation: food-bounce 2s ease-in-out infinite;
+}
+
+@keyframes food-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Rotating utensils */
+.rotate-utensils {
+  animation: rotate-utensils 4s linear infinite;
+}
+
+@keyframes rotate-utensils {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Fade in up for content */
+.fade-in-up {
+  animation: fade-in-up 0.8s ease-out;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scale in with bounce */
+.scale-in-bounce {
+  animation: scale-in-bounce 0.6s ease-out;
+}
+
+@keyframes scale-in-bounce {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }

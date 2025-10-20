@@ -5,9 +5,202 @@
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bite Restaurant</title>
+    <style>
+      /* Preloader Styles */
+      #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(to bottom, #f8eee2 0%, #f7dece 50%, #FFEDD5 100%);
+        background-attachment: fixed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+      }
+
+      .preloader-content {
+        text-align: center;
+      }
+
+      .preloader-icons {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .preloader-icon {
+        animation: bounce 1s infinite;
+        font-size: 2rem;
+        color: #d97706;
+      }
+
+      .preloader-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+        animation: pulse 2s infinite;
+      }
+
+      .preloader-subtitle {
+        color: #6b7280;
+        font-size: 1.125rem;
+        margin-bottom: 2rem;
+      }
+
+      .preloader-progress {
+        width: 16rem;
+        margin: 0 auto 1rem;
+      }
+
+      .progress-bar {
+        background-color: #fbbf24;
+        opacity: 0.5;
+        border-radius: 9999px;
+        height: 0.75rem;
+      }
+
+      .progress-fill {
+        background-color: #d97706;
+        height: 0.75rem;
+        border-radius: 9999px;
+        transition: width 0.3s ease;
+        width: 0%;
+      }
+
+      .preloader-percentage {
+        color: #374151;
+        font-weight: 600;
+      }
+
+      .loading-dots {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+      }
+
+      .loading-dot {
+        width: 0.75rem;
+        height: 0.75rem;
+        background-color: #d97706;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+
+      .chef-quote {
+        color: #6b7280;
+        font-style: italic;
+        margin-top: 2rem;
+        max-width: 24rem;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Animations */
+      @keyframes bounce {
+        0%, 100% {
+          transform: translateY(-25%);
+          animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+        }
+        50% {
+          transform: translateY(0);
+          animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+        }
+      }
+
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      /* Hide preloader when loaded */
+      .preloader-hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      /* Prevent scrolling during loading */
+      body.preloading {
+        overflow: hidden;
+      }
+    </style>
   </head>
-  <body>
+  <body class="preloading">
+    <!-- Preloader -->
+    <div id="preloader">
+      <div class="preloader-content">
+        <div class="preloader-icons">
+          <div class="preloader-icon" style="animation-delay: 0s;">🍕</div>
+          <div class="preloader-icon" style="animation-delay: 0.2s;">🍔</div>
+          <div class="preloader-icon" style="animation-delay: 0.4s;">🍝</div>
+          <div class="preloader-icon" style="animation-delay: 0.6s;">🍰</div>
+        </div>
+
+        <h1 class="preloader-title">Bite Restaurant</h1>
+        <p class="preloader-subtitle">Preparing your culinary journey...</p>
+
+        <div class="preloader-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+
+        <div class="preloader-percentage" id="progressPercentage">0%</div>
+
+        <div class="loading-dots">
+          <div class="loading-dot" style="animation-delay: 0s;"></div>
+          <div class="loading-dot" style="animation-delay: 0.2s;"></div>
+          <div class="loading-dot" style="animation-delay: 0.4s;"></div>
+        </div>
+
+        <p class="chef-quote">"Good food is the foundation of genuine happiness"</p>
+      </div>
+    </div>
+
+    <!-- React App Root -->
     <div id="root"></div>
+
     <script type="module" src="/src/main.jsx"></script>
+    
+    <script>
+      // Preloader progress animation
+      let progress = 0;
+      const progressFill = document.getElementById('progressFill');
+      const progressPercentage = document.getElementById('progressPercentage');
+      
+      const progressInterval = setInterval(() => {
+        progress += 2;
+        if (progress <= 100) {
+          progressFill.style.width = progress + '%';
+          progressPercentage.textContent = progress + '%';
+        } else {
+          clearInterval(progressInterval);
+        }
+      }, 80);
+
+      // Hide preloader when React app is ready
+      window.addEventListener('load', function() {
+        setTimeout(() => {
+          const preloader = document.getElementById('preloader');
+          preloader.classList.add('preloader-hidden');
+          document.body.classList.remove('preloading');
+          
+          // Remove preloader from DOM after animation
+          setTimeout(() => {
+            preloader.remove();
+          }, 500);
+        }, 3500); // Match this with your React app loading time
+      });
+    </script>
   </body>
 </html>
