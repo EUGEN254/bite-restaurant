@@ -10,6 +10,9 @@ import Menu from "./pages/Menu";
 import Hotel from "./pages/Hotel";
 import Reservation from "./pages/Reservation";
 import MoreAboutUs from "./pages/MoreAboutUs";
+import MyReservations from "./pages/MyReservations";
+import Contact from "./pages/Contact";
+import Blogs from "./pages/Blogs";
 
 const App = () => {
   return (
@@ -37,6 +40,9 @@ const App = () => {
         <Route path="/hotels" element={<Hotel />} />
         <Route path="/reservation" element={<Reservation />} />
         <Route path="/description" element={<MoreAboutUs />} />
+        <Route path="/my-reservations" element={<MyReservations />} />
+        <Route path="/contacts" element={<Contact />} />
+        <Route path="/blogs" element={<Blogs />} />
       </Routes>
 
       {/* footer to all pages */}
