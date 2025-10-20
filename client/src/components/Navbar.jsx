@@ -10,40 +10,6 @@ const Navbar = () => {
   const [user, setUser] = useState(true);
   const [showMenu, setShowMenu] = useState(false);
 
-  const scrollToAbout = () => {
-    if (window.location.pathname !== '/') {
-      navigate('/');
-      setTimeout(() => {
-        const aboutSection = document.getElementById('about-us');
-        if (aboutSection) {
-          aboutSection.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 1000);
-    } else {
-      const aboutSection = document.getElementById('about-us');
-      if (aboutSection) {
-        aboutSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-  };
-
-  const scrollToTestimonials = () => {
-    if (window.location.pathname !== '/') {
-      navigate('/');
-      setTimeout(() => {
-        const testimonialsSection = document.getElementById('testimonials');
-        if (testimonialsSection) {
-          testimonialsSection.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 1000);
-    } else {
-      const testimonialsSection = document.getElementById('testimonials');
-      if (testimonialsSection) {
-        testimonialsSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-  };
-
   return (
     <>
       <div className="flex items-center justify-between text-sm py-4 mb-5">
@@ -58,49 +24,39 @@ const Navbar = () => {
         {/* Desktop Menu */}
         <ul className="hidden md:flex items-center ml-30 gap-5 font-medium">
           <NavLink to="/" className="group">
-            <li className="py-1 group-hover:text-amber-600 transition-colors duration-300">Home</li>
+            <li className="py-1 group-hover:text-amber-600 transition-colors duration-300">
+              Home
+            </li>
             <hr className="border-none outline-none h-0.5 bg-amber-500 w-3/5 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </NavLink>
-          <NavLink className="group">
+          <NavLink to="/description" className="group">
             <li className="group-hover:text-amber-600 transition-colors duration-300">
-              <a
-                href="#about-us"
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollToAbout();
-                }}
-                className="block"
-              >
-                About Us
-              </a>
+              About Us
             </li>
             <hr className="border-none outline-none h-0.5 bg-amber-500 w-3/5 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </NavLink>
           <NavLink to="/menu" className="group">
-            <li className="group-hover:text-amber-600 transition-colors duration-300">Menu</li>
+            <li className="group-hover:text-amber-600 transition-colors duration-300">
+              Menu
+            </li>
             <hr className="border-none outline-none h-0.5 bg-amber-500 w-3/5 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </NavLink>
-          <NavLink className="group">
+          <NavLink to="/hotels" className="group">
             <li className="group-hover:text-amber-600 transition-colors duration-300">
-              <a
-                href="#testimonials"
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollToTestimonials();
-                }}
-                className="block"
-              >
-                Testimonials
-              </a>
+              Hotels
             </li>
             <hr className="border-none outline-none h-0.5 bg-amber-500 w-3/5 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </NavLink>
           <NavLink to="/blogs" className="group">
-            <li className="group-hover:text-amber-600 transition-colors duration-300">Blogs</li>
+            <li className="group-hover:text-amber-600 transition-colors duration-300">
+              Blogs
+            </li>
             <hr className="border-none outline-none h-0.5 bg-amber-500 w-3/5 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </NavLink>
           <NavLink to="/contacts" className="group">
-            <li className="group-hover:text-amber-600 transition-colors duration-300">Contacts</li>
+            <li className="group-hover:text-amber-600 transition-colors duration-300">
+              Contacts
+            </li>
             <hr className="border-none outline-none h-0.5 bg-amber-500 w-3/5 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </NavLink>
         </ul>
@@ -201,34 +157,34 @@ const Navbar = () => {
 
         <ul className="flex flex-col items-start  gap-4 mt-5 px-5 ml-8 font-medium text-lg">
           <NavLink onClick={() => setShowMenu(false)} to={"/"}>
-            <li className="px-4 py-2 rounded inline-block hover:text-amber-600 hover:bg-amber-100 transition-all duration-300">Home</li>
+            <li className="px-4 py-2 rounded inline-block hover:text-amber-600 hover:bg-amber-100 transition-all duration-300">
+              Home
+            </li>
           </NavLink>
-          <NavLink 
-            onClick={(e) => {
-              e.preventDefault();
-              setShowMenu(false);
-              scrollToAbout();
-            }}
-          >
-            <li className="px-4 py-2 rounded inline-block hover:text-amber-600 hover:bg-amber-100 transition-all duration-300">About Us</li>
+          <NavLink to={"/description"}>
+            <li className="px-4 py-2 rounded inline-block hover:text-amber-600 hover:bg-amber-100 transition-all duration-300">
+              About Us
+            </li>
           </NavLink>
           <NavLink onClick={() => setShowMenu(false)} to={"/menu"}>
-            <li className="px-4 py-2 rounded inline-block hover:text-amber-600 hover:bg-amber-100 transition-all duration-300">Menu</li>
+            <li className="px-4 py-2 rounded inline-block hover:text-amber-600 hover:bg-amber-100 transition-all duration-300">
+              Menu
+            </li>
           </NavLink>
-          <NavLink 
-            onClick={(e) => {
-              e.preventDefault();
-              setShowMenu(false);
-              scrollToTestimonials();
-            }}
-          >
-            <li className="px-4 py-2 rounded inline-block hover:text-amber-600 hover:bg-amber-100 transition-all duration-300">Testimonials</li>
+          <NavLink onClick={() => setShowMenu(false)} to={"/hotels"}>
+            <li className="px-4 py-2 rounded inline-block hover:text-amber-600 hover:bg-amber-100 transition-all duration-300">
+              Hotels
+            </li>
           </NavLink>
           <NavLink onClick={() => setShowMenu(false)} to={"/blogs"}>
-            <li className="px-4 py-2 rounded inline-block hover:text-amber-600 hover:bg-amber-100 transition-all duration-300">Blogs</li>
+            <li className="px-4 py-2 rounded inline-block hover:text-amber-600 hover:bg-amber-100 transition-all duration-300">
+              Blogs
+            </li>
           </NavLink>
           <NavLink onClick={() => setShowMenu(false)} to={"/contacts"}>
-            <li className="px-4 py-2 rounded inline-block hover:text-amber-600 hover:bg-amber-100 transition-all duration-300">Contacts</li>
+            <li className="px-4 py-2 rounded inline-block hover:text-amber-600 hover:bg-amber-100 transition-all duration-300">
+              Contacts
+            </li>
           </NavLink>
         </ul>
       </div>

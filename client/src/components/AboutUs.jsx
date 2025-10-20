@@ -70,9 +70,8 @@ const AboutUs = () => {
               </li>
             </div>
           </ul>
-
           <button 
-          onClick={()=> navigate('/about-us')}
+          onClick={()=> {navigate('/description'); window.scrollTo({ top: 0, behavior: 'smooth' })}}
           className="flex items-center font-medium mt-5 gap-2 bg-amber-400 px-6 lg:px-8 py-3 rounded-full text-black hover:scale-95 lg:hover:scale-90 transition-all duration-300 text-sm lg:text-base whitespace-nowrap">
             More
           </button>

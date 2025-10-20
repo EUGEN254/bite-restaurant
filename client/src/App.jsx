@@ -6,6 +6,10 @@ import Footer from "./components/Footer";
 import { Route, Routes } from "react-router-dom";
 import AboutUs from "./components/AboutUs";
 import Testimonials from "./components/Testimonials";
+import Menu from "./pages/Menu";
+import Hotel from "./pages/Hotel";
+import Reservation from "./pages/Reservation";
+import MoreAboutUs from "./pages/MoreAboutUs";
 
 const App = () => {
   return (
@@ -25,11 +29,14 @@ const App = () => {
       <Navbar />
 
       {/* public routes */}
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about-us" element={<AboutUs />} />
         <Route path="/testimonial" element={<Testimonials />} />
+        <Route path="/menu" element={<Menu />} />
+        <Route path="/hotels" element={<Hotel />} />
+        <Route path="/reservation" element={<Reservation />} />
+        <Route path="/description" element={<MoreAboutUs />} />
       </Routes>
 
       {/* footer to all pages */}

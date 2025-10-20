@@ -1,0 +1,83 @@
+import React from "react";
+import { assets } from "../assets/assets";
+import {
+    FaShoppingCart,
+    FaClock,
+    FaBroom,
+    FaCalendarCheck,
+    FaUtensils,
+    FaUserTie,
+  } from "react-icons/fa";
+  import { useNavigate } from "react-router-dom";
+  
+
+const MoreAboutUs = () => {
+  return (
+    <div>
+      <div
+        className="mt-30 flex flex-col lg:flex-row gap-10 lg:gap-40 items-center"
+      >
+        {/* left side - Chef Image */}
+        <div className="relative">
+          <img
+            src={assets.chef}
+            className="transform rotate-2 hover:rotate-0 transition-transform duration-500 ease-in-out max-w-xs lg:max-w-md"
+            alt="Chef"
+          />
+          {/* decoration */}
+          <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-amber-400 rounded-full opacity-20 -z-10"></div>
+        </div>
+
+        {/* right side */}
+        <div className="flex flex-col justify-between gap-8">
+          <div className="flex flex-col gap-5">
+            <p className="font-bold text-2xl lg:text-3xl text-gray-800">
+              We Are More Than <br /> Multiple Service
+            </p>
+            <div className="text-sm text-gray-600 max-w-xs lg:max-w-md">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+              Voluptatem labore iste mollitia consequuntur modi aspernatur!
+              Distinctio recusandae natus veniam error ut! Minus saepe natus eum
+              velit ipsa reiciendis, accusantium voluptatem.
+            </div>
+          </div>
+
+          <div className="text-sm text-gray-600">
+            <ul className="flex flex-col lg:flex-row gap-8 lg:gap-20">
+              <div className="flex flex-col gap-4">
+                <li className="flex items-center gap-3">
+                  <FaShoppingCart className="text-amber-500 text-lg" />
+                  <span>Online Orders</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <FaClock className="text-amber-500 text-lg" />
+                  <span>24/7 Service</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <FaBroom className="text-amber-500 text-lg" />
+                  <span>Clean Kitchen</span>
+                </li>
+              </div>
+              <div className="flex flex-col gap-4">
+                <li className="flex items-center gap-3">
+                  <FaCalendarCheck className="text-amber-500 text-lg" />
+                  <span>Pre-Reservation</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <FaUtensils className="text-amber-500 text-lg" />
+                  <span>Organized Foodie Place</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <FaUserTie className="text-amber-500 text-lg" />
+                  <span>Super Chefs</span>
+                </li>
+              </div>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MoreAboutUs;

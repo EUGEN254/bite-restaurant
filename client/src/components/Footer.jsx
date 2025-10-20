@@ -48,9 +48,9 @@ const Footer = () => {
           <ul className="space-y-3">
             {[
               { to: "/", icon: FaHome, text: "Home" },
-              { to: "/about-us", icon: FaUserFriends, text: "About Us" },
+              { to: "/description", icon: FaUserFriends, text: "About Us" },
               { to: "/menu", icon: FaUtensils, text: "Menu" },
-              { to: "/testimonial", icon: FaStar, text: "Testimonials" },
+              { to: "/hotels", icon: FaStar, text: "Hotels" },
               { to: "/blogs", icon: FaBlog, text: "Blogs" },
               { to: "/contacts", icon: FaPhoneAlt, text: "Contacts" },
             ].map((link, index) => (

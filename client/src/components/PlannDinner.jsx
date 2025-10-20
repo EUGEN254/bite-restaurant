@@ -1,7 +1,9 @@
 import React from "react";
 import { assets } from "../assets/assets";
+import { useNavigate } from "react-router-dom";
 
 const PlannDinner = () => {
+  const navigate = useNavigate()
   return (
     <div className="flex flex-row justify-between items-center px-20 py-10 mt-10">
       {/* left side */}
@@ -19,7 +21,9 @@ const PlannDinner = () => {
         </div>
 
         <div className="mt-4">
-          <button className="flex items-center gap-2 bg-amber-400 px-6 lg:px-8 py-3 rounded-full text-black hover:scale-95 lg:hover:scale-90 transition-all duration-300 text-sm lg:text-base whitespace-nowrap">
+          <button 
+          onClick={() => navigate("/reservation")}
+          className="flex items-center gap-2 bg-amber-400 px-6 lg:px-8 py-3 rounded-full text-black hover:scale-95 lg:hover:scale-90 transition-all duration-300 text-sm lg:text-base whitespace-nowrap">
             Reserve
           </button>
         </div>

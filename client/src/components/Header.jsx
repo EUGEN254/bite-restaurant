@@ -8,8 +8,10 @@ import {
   FaCookieBite,
 } from "react-icons/fa";
 import { assets } from "../assets/assets";
+import {useNavigate} from 'react-router-dom'
 
 const Header = () => {
+  const navigate = useNavigate()
   return (
     <div className="flex flex-col lg:flex-row gap-8 lg:gap-5 items-center lg:items-start mt-10 lg:mt-20 px-5 lg:px-20 animate-fade-in">
       {/* Text Content Section */}
@@ -28,7 +30,9 @@ const Header = () => {
           delectus cum officiis explicabo!
         </p>
         <div className="flex flex-row gap-3 lg:gap-4 justify-start w-full">
-          <button className="flex items-center gap-2 bg-amber-400 px-6 lg:px-8 py-3 rounded-full text-black hover:scale-95 lg:hover:scale-90 transition-all duration-300 text-sm lg:text-base whitespace-nowrap">
+          <button 
+          onClick={()=>navigate('/menu')}
+          className="flex items-center gap-2 bg-amber-400 px-6 lg:px-8 py-3 rounded-full text-black hover:scale-95 lg:hover:scale-90 transition-all duration-300 text-sm lg:text-base whitespace-nowrap">
             Explore Food
             <img className="w-3" src={assets.arrow_icon} alt="" />
           </button>
