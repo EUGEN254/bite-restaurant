@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ToastContainer } from "react-toastify";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -13,11 +13,20 @@ import MoreAboutUs from "./pages/MoreAboutUs";
 import MyReservations from "./pages/MyReservations";
 import Contact from "./pages/Contact";
 import Blogs from "./pages/Blogs";
+import LoginSignUp from "./components/LoginSignUp";
 
 const App = () => {
+  const [showLogin, setShowLogin] = useState(false);
+
+  // If showLogin is true, ONLY show the LoginSignUp component
+  if (showLogin) {
+    return <LoginSignUp setShowLogin={setShowLogin} />;
+  }
+
+  // If showLogin is false, show the normal app layout
   return (
     <div className="mx-2 sm:mx-[5%]">
-      {/* for toast notifications */}
+      {/* Toast Notifications */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -27,11 +36,11 @@ const App = () => {
         draggable
         className="!z-[1000]"
       />
-      {/* to appear in all pages */}
 
-      <Navbar />
+      {/* Navbar - Appears on all pages */}
+      <Navbar setShowLogin={setShowLogin} />
 
-      {/* public routes */}
+      {/* Public Routes */}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about-us" element={<AboutUs />} />
@@ -45,7 +54,7 @@ const App = () => {
         <Route path="/blogs" element={<Blogs />} />
       </Routes>
 
-      {/* footer to all pages */}
+      {/* Footer - Appears on all pages */}
       <Footer />
     </div>
   );

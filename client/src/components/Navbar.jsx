@@ -5,7 +5,7 @@ import { MdShoppingBasket } from "react-icons/md";
 import { HiOutlineMenu } from "react-icons/hi";
 import { RiCloseLine } from "react-icons/ri";
 
-const Navbar = () => {
+const Navbar = ({setShowLogin}) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(true);
   const [showMenu, setShowMenu] = useState(false);
@@ -140,7 +140,7 @@ const Navbar = () => {
             </div>
           ) : (
             <button
-              onClick={() => navigate("/login")}
+            onClick={()=>setShowLogin(true)}
               className="text-black bg-amber-400 px-8 py-3 rounded-full cursor-pointer font-medium hover:bg-amber-500 transition"
             >
               Create account
