@@ -14,6 +14,9 @@ import MyReservations from "./pages/MyReservations";
 import Contact from "./pages/Contact";
 import Blogs from "./pages/Blogs";
 import LoginSignUp from "./components/LoginSignUp";
+import Notification from "./pages/Notification";
+import Cart from "./pages/Cart";
+import Payment from "./pages/Payment";
 
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -52,6 +55,9 @@ const App = () => {
         <Route path="/my-reservations" element={<MyReservations />} />
         <Route path="/contacts" element={<Contact />} />
         <Route path="/blogs" element={<Blogs />} />
+        <Route path="/notification" element={<Notification />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Payment />} />
       </Routes>
 
       {/* Footer - Appears on all pages */}

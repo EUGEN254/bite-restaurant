@@ -1,8 +1,10 @@
 import React, { useRef, useState } from "react";
 import { assets, food_list } from "../assets/assets";
+import { useNavigate } from "react-router-dom";
 
 const PopularDishes = () => {
   const scrollContainerRef = useRef(null);
+  const navigate = useNavigate()
 
   // Function to scroll left
   const scrollLeft = () => {
@@ -80,7 +82,12 @@ const PopularDishes = () => {
                   </p>
                 </div>
                 <div className="flex-shrink-0">
-                  <button className="whitespace-nowrap bg-gradient-to-b from-[#f8eee2] via-[#f7dece] to-white border-2 border-amber-300 px-4 py-2 rounded-full font-medium hover:bg-amber-400 transition-all duration-300 cursor-pointer text-sm">
+                  <button 
+                  onClick={() => {
+                    navigate('/cart', { state: { food } });
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="whitespace-nowrap bg-gradient-to-b from-[#f8eee2] via-[#f7dece] to-white border-2 border-amber-300 px-4 py-2 rounded-full font-medium hover:bg-amber-400 transition-all duration-300 cursor-pointer text-sm">
                     Order Now
                   </button>
                 </div>

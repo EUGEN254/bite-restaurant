@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { food_list, menu_list } from "../assets/assets";
+import { useNavigate } from "react-router-dom";
 
 const Menu = () => {
+  const navigate = useNavigate()
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortOption, setSortOption] = useState("default");
   const [priceRange, setPriceRange] = useState(50); // Max price filter
@@ -17,11 +19,11 @@ const Menu = () => {
   const sortedFoodList = [...filteredFoodList].sort((a, b) => {
     switch (sortOption) {
       case "price-low-high":
-        return a.price - b.price;//so like 10-15 => -5 so a comes first
+        return a.price - b.price;
       case "price-high-low":
         return b.price - a.price;
       case "name-a-z":
-        return a.name.localeCompare(b.name);//alphabetically comparison
+        return a.name.localeCompare(b.name);
       case "name-z-a":
         return b.name.localeCompare(a.name);
       default:
@@ -47,11 +49,40 @@ const Menu = () => {
         </p>
       </div>
 
-      {/* Category Grid */}
+      {/* Category Grid - Horizontal scroll only on mobile/tablet */}
       <div className="max-w-7xl mx-auto mb-16">
         <h2 className="text-2xl font-semibold text-gray-800 mb-8 text-center">Categories</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-6">
-          {/* Menu Categories */}
+        
+        {/* Horizontal Scroll Container for mobile/tablet, Grid for desktop */}
+        <div className="lg:hidden"> {/* Mobile/Tablet: Horizontal scroll */}
+          <div className="flex overflow-x-auto pb-4 scrollbar-hide space-x-4">
+            {menu_list.map((category, index) => (
+              <div 
+                key={index}
+                onClick={() => setSelectedCategory(category.menu_name)}
+                className={`group cursor-pointer transition-all duration-300 hover:scale-105 flex-shrink-0 w-32 ${
+                  selectedCategory === category.menu_name ? "ring-2 ring-amber-500 rounded-2xl" : ""
+                }`}
+              >
+                <div className={`bg-gradient-to-b from-[#f8eee2] via-[#f7dece] to-[#f7dece] rounded-2xl p-3 shadow-lg hover:shadow-xl transition-shadow duration-300 ${
+                  selectedCategory === category.menu_name ? "bg-amber-100" : ""
+                }`}>
+                  <img 
+                    src={category.menu_image} 
+                    alt={category.menu_name} 
+                    className="w-full h-20 object-cover rounded-xl"
+                  />
+                </div>
+                <p className="text-center text-sm font-medium text-gray-700 mt-2 group-hover:text-amber-600 transition-colors whitespace-nowrap">
+                  {category.menu_name}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop: Original Grid Layout */}
+        <div className="hidden lg:grid grid-cols-4 xl:grid-cols-8 gap-6">
           {menu_list.map((category, index) => (
             <div 
               key={index}
@@ -199,7 +230,12 @@ const Menu = () => {
                           Kes {food.price}
                         </span>
                       </div>
-                      <button className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-2xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
+                      <button
+                       onClick={() => {
+                        navigate('/cart', { state: { food } });
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                       className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-2xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
                         Order Now
                       </button>
                     </div>
@@ -211,7 +247,7 @@ const Menu = () => {
         )}
       </div>
 
-      {/*custom styles for the range slider */}
+      {/* Custom styles for the range slider and scrollbar */}
       <style jsx>{`
         .slider::-webkit-slider-thumb {
           appearance: none;
@@ -232,6 +268,17 @@ const Menu = () => {
           cursor: pointer;
           border: 2px solid white;
           box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .scrollbar-hide {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
         }
       `}</style>
     </div>

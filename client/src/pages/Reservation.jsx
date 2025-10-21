@@ -155,45 +155,6 @@ const Reservation = () => {
                 </div>
               ))}
             </div>
-
-            {/* Selected Table Controls */}
-            {selectedTable && (
-              <div className="mt-6 p-4 bg-amber-50 rounded-2xl border border-amber-200">
-                <h3 className="font-semibold text-gray-800 mb-3">
-                  Adjust Seats for {selectedTable.name}
-                </h3>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <button
-                      onClick={() => adjustSeats(selectedTable.id, -1)}
-                      disabled={selectedTable.currentSeats <= 1}
-                      className="p-2 rounded-full bg-white border border-amber-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-100 transition-colors"
-                    >
-                      <FaMinus className="text-amber-600" />
-                    </button>
-
-                    <div className="flex items-center gap-2">
-                      {renderSeats(selectedTable, true)}
-                    </div>
-
-                    <button
-                      onClick={() => adjustSeats(selectedTable.id, 1)}
-                      disabled={
-                        selectedTable.currentSeats >= selectedTable.maxSeats
-                      }
-                      className="p-2 rounded-full bg-white border border-amber-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-100 transition-colors"
-                    >
-                      <FaPlus className="text-amber-600" />
-                    </button>
-                  </div>
-
-                  <span className="text-sm text-gray-600">
-                    {selectedTable.currentSeats} of {selectedTable.maxSeats}{" "}
-                    seats
-                  </span>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Right Side - Reservation Form */}
@@ -234,7 +195,45 @@ const Reservation = () => {
                 </div>
               </div>
 
-              {/* Guest Count */}
+              {/* Selected Table Controls - NOW ABOVE Guest Count */}
+              {selectedTable && (
+                <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200">
+                  <h3 className="font-semibold text-gray-800 mb-3">
+                    Adjust Seats for {selectedTable.name}
+                  </h3>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => adjustSeats(selectedTable.id, -1)}
+                        disabled={selectedTable.currentSeats <= 1}
+                        className="p-2 rounded-full bg-white border border-amber-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-100 transition-colors"
+                      >
+                        <FaMinus className="text-amber-600" />
+                      </button>
+
+                      <div className="flex items-center gap-2">
+                        {renderSeats(selectedTable, true)}
+                      </div>
+
+                      <button
+                        onClick={() => adjustSeats(selectedTable.id, 1)}
+                        disabled={
+                          selectedTable.currentSeats >= selectedTable.maxSeats
+                        }
+                        className="p-2 rounded-full bg-white border border-amber-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-100 transition-colors"
+                      >
+                        <FaPlus className="text-amber-600" />
+                      </button>
+                    </div>
+
+                    <span className="text-sm text-gray-600">
+                      {selectedTable.currentSeats} of {selectedTable.maxSeats} seats
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Guest Count - NOW BELOW Seat Controls */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                   <MdPeople className="text-amber-500" />
@@ -262,7 +261,7 @@ const Reservation = () => {
                   </button>
                   <span className="text-sm text-gray-500 ml-2">
                     {selectedTable
-                      ? `(Table seats: ${selectedTable.currentSeats})`
+                      ? `(Available Table seats: ${selectedTable.currentSeats})`
                       : "Select a table first"}
                   </span>
                 </div>

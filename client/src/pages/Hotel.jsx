@@ -177,7 +177,7 @@ const Hotel = () => {
                             {item.name}
                           </h2>
                           <p className="text-gray-600 mb-1">
-                            📍 {item.address}
+                             {item.address}
                           </p>
                           <div
                             className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${

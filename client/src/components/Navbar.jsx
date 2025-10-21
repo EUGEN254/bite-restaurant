@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { MdShoppingBasket } from "react-icons/md";
+import { FaBell } from "react-icons/fa";
 import { HiOutlineMenu } from "react-icons/hi";
 import { RiCloseLine } from "react-icons/ri";
 
-const Navbar = ({setShowLogin}) => {
+const Navbar = ({ setShowLogin }) => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(true);
+  const [user, setUser] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -64,6 +65,14 @@ const Navbar = ({setShowLogin}) => {
 
         {/* Right Side */}
         <div className="flex items-center gap-4">
+          {/* Notification */}
+          <NavLink to="/notification" className="relative">
+            <FaBell className="text-2xl text-amber-700 cursor-pointer hover:text-amber-800 transition" />
+            <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-400 flex items-center justify-center text-xs font-medium text-white">
+              2
+            </div>
+          </NavLink>
+
           {/* basket icon */}
           <NavLink to="/cart" className="relative">
             <MdShoppingBasket className="text-2xl text-amber-700 cursor-pointer hover:text-amber-800 transition" />
@@ -71,12 +80,12 @@ const Navbar = ({setShowLogin}) => {
               2
             </div>
           </NavLink>
-          
+
           {/* Avatar or Login */}
           {user ? (
             <div className="flex items-center gap-4">
               {/* User Profile with Dropdown */}
-              <div 
+              <div
                 className="relative group"
                 onMouseEnter={() => setShowDropdown(true)}
                 onMouseLeave={() => setShowDropdown(false)}
@@ -91,7 +100,9 @@ const Navbar = ({setShowLogin}) => {
                   <img
                     src={assets.dropdown}
                     alt="dropdown"
-                    className={`w-3 transition-transform duration-200 ${showDropdown ? "rotate-180" : ""}`}
+                    className={`w-3 transition-transform duration-200 ${
+                      showDropdown ? "rotate-180" : ""
+                    }`}
                   />
                 </div>
 
@@ -131,8 +142,8 @@ const Navbar = ({setShowLogin}) => {
               </div>
 
               {/* Reserve Table Button - SEPARATE from dropdown */}
-              <button 
-                onClick={() => navigate('/reservation')}
+              <button
+                onClick={() => navigate("/reservation")}
                 className="text-black bg-amber-400 px-6 py-2 rounded-full cursor-pointer font-medium hover:bg-amber-500 transition"
               >
                 Reserve Table
@@ -140,7 +151,7 @@ const Navbar = ({setShowLogin}) => {
             </div>
           ) : (
             <button
-            onClick={()=>setShowLogin(true)}
+              onClick={() => setShowLogin(true)}
               className="text-black bg-amber-400 px-8 py-3 rounded-full cursor-pointer font-medium hover:bg-amber-500 transition"
             >
               Create account
@@ -148,10 +159,7 @@ const Navbar = ({setShowLogin}) => {
           )}
 
           {/* mobile menu Icon */}
-          <button 
-            onClick={() => setShowMenu(true)}
-            className="md:hidden"
-          >
+          <button onClick={() => setShowMenu(true)} className="md:hidden">
             <HiOutlineMenu className="text-3xl text-amber-700 cursor-pointer hover:text-amber-800 transition" />
           </button>
         </div>
@@ -214,9 +222,9 @@ const Navbar = ({setShowLogin}) => {
         <div className="mt-8 px-8">
           {user ? (
             <div className="flex flex-col gap-4">
-              <button 
+              <button
                 onClick={() => {
-                  navigate('/reservation');
+                  navigate("/reservation");
                   setShowMenu(false);
                 }}
                 className="w-full text-black bg-amber-400 px-6 py-3 rounded-full cursor-pointer font-medium hover:bg-amber-500 transition"
