@@ -60,7 +60,7 @@ const Payment = () => {
   const getBackButtonText = () => {
     switch (orderType) {
       case 'hotel':
-        return 'Back to Hotels';
+        return 'Back to Hotel checkout';
       case 'reservation':
         return 'Back to Reservation';
       default:
@@ -82,7 +82,7 @@ const Payment = () => {
   const getBackButtonRoute = () => {
     switch (orderType) {
       case 'hotel':
-        return '/hotels';
+        return -1;
       case 'reservation':
         return '/reservation';
       default:

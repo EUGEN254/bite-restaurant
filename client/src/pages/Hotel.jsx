@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { counties, hotel } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
+import { useRestaurant } from "../context/RestaurantContext";
 
 const Hotel = () => {
   const [selectedCity, setSelectedCity] = useState("");
@@ -13,6 +14,7 @@ const Hotel = () => {
   const [hotelNames, setHotelNames] = useState(hotel.map((h) => h.name));
   const [priceRange, setPriceRange] = useState(5000);
   const maxPrice = Math.max(...hotel.map((h) => h.pricePerNight));
+   const { addHotel} = useRestaurant();
 
   // filtering logic
   const filteredHotels = hotel.filter((item) => {
@@ -37,6 +39,13 @@ const Hotel = () => {
       return 0; // default, no sorting
     }
   });
+
+  const handleOrderHotel = (hotel) =>{
+    addHotel(hotel)
+    navigate('/hotel-checkout');
+    window.scrollTo({top:0,behaviour:'smooth'})
+
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f8eee2] via-[#f7dece] to-white py-8 px-4">
@@ -222,10 +231,7 @@ const Hotel = () => {
                     <button
                       onClick={() => {
                         if (item.isAvailable) {
-                          navigate("/hotel-checkout", {
-                            state: { hotel: item },
-                          });
-                          window.scrollTo({ top: 0, behavior: "smooth" });
+                          handleOrderHotel(item)
                         }
                       }}
                       className={`w-full mt-6 py-3 px-6 rounded-xl font-semibold transition-all duration-300 ${
