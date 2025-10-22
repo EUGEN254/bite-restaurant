@@ -5,9 +5,11 @@ import { MdShoppingBasket } from "react-icons/md";
 import { FaBell } from "react-icons/fa";
 import { HiOutlineMenu } from "react-icons/hi";
 import { RiCloseLine } from "react-icons/ri";
+import { useRestaurant } from "../context/RestaurantContext";
 
 const Navbar = ({ setShowLogin }) => {
   const navigate = useNavigate();
+  const { getTotalItems } = useRestaurant(); 
   const [user, setUser] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -25,13 +27,13 @@ const Navbar = ({ setShowLogin }) => {
 
         {/* Desktop Menu */}
         <ul className="hidden md:flex items-center ml-30 gap-5 font-medium">
-          <NavLink to="/" className="group">
+          <NavLink to="/" className="group" aria-label="Home">
             <li className="py-1 group-hover:text-amber-600 transition-colors duration-300">
               Home
             </li>
             <hr className="border-none outline-none h-0.5 bg-amber-500 w-3/5 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </NavLink>
-          <NavLink to="/description" className="group">
+          <NavLink to="/description" className="group" aria-label="About Us">
             <li className="group-hover:text-amber-600 transition-colors duration-300">
               About Us
             </li>
@@ -83,7 +85,7 @@ const Navbar = ({ setShowLogin }) => {
           <NavLink to="/cart" className="relative">
             <MdShoppingBasket className="text-2xl text-amber-700 cursor-pointer hover:text-amber-800 transition" />
             <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-400 flex items-center justify-center text-xs font-medium text-white">
-              2
+              {getTotalItems()} {/* Dynamic cart count */}
             </div>
           </NavLink>
 

@@ -10,6 +10,15 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
+const services = [
+  { icon: FaShoppingCart, text: "Online Orders" },
+  { icon: FaClock, text: "24/7 Service" },
+  { icon: FaBroom, text: "Clean Kitchen" },
+  { icon: FaCalendarCheck, text: "Pre-Reservation" },
+  { icon: FaUtensils, text: "Organized Foodie Place" },
+  { icon: FaUserTie, text: "Super Chefs" },
+];
+
 const AboutUs = () => {
   const navigate = useNavigate();
   return (
@@ -32,43 +41,18 @@ const AboutUs = () => {
             We Are More Than <br /> Multiple Service
           </p>
           <div className="text-sm text-gray-600 max-w-xs lg:max-w-md">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatem
-            labore iste mollitia consequuntur modi aspernatur! Distinctio
-            recusandae natus veniam error ut! Minus saepe natus eum velit ipsa
-            reiciendis, accusantium voluptatem.
+            We provide a variety of services to ensure your dining experience is exceptional. From online orders to organized foodie places, we have it all.
           </div>
         </div>
 
         <div className="text-sm text-gray-600">
           <ul className="flex flex-col lg:flex-row gap-8 lg:gap-20">
-            <div className="flex flex-col gap-4">
-              <li className="flex items-center gap-3">
-                <FaShoppingCart className="text-amber-500 text-lg" />
-                <span>Online Orders</span>
+            {services.map((service, index) => (
+              <li key={index} className="flex items-center gap-3">
+                <service.icon className="text-amber-500 text-lg" />
+                <span>{service.text}</span>
               </li>
-              <li className="flex items-center gap-3">
-                <FaClock className="text-amber-500 text-lg" />
-                <span>24/7 Service</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <FaBroom className="text-amber-500 text-lg" />
-                <span>Clean Kitchen</span>
-              </li>
-            </div>
-            <div className="flex flex-col gap-4">
-              <li className="flex items-center gap-3">
-                <FaCalendarCheck className="text-amber-500 text-lg" />
-                <span>Pre-Reservation</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <FaUtensils className="text-amber-500 text-lg" />
-                <span>Organized Foodie Place</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <FaUserTie className="text-amber-500 text-lg" />
-                <span>Super Chefs</span>
-              </li>
-            </div>
+            ))}
           </ul>
           <button 
           onClick={()=> {navigate('/description'); window.scrollTo({ top: 0, behavior: 'smooth' })}}

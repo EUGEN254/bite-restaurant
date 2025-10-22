@@ -15,8 +15,7 @@ const PlannDinner = () => {
             Your Table
           </p>
           <p className="text-xs sm:text-sm text-gray-600 max-w-xs sm:max-w-sm mx-auto lg:mx-0">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla autem
-            rem met reprquia impedit expedita quod.
+            Make your dinner plans special with our exclusive table reservations. Enjoy a delightful dining experience tailored just for you.
           </p>
         </div>
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRestaurant } from '../context/RestaurantContext'; // Make sure this import path is correct
+import { toast } from 'react-toastify';
 
 const Cart = () => {
     const navigate = useNavigate();
@@ -17,15 +18,20 @@ const Cart = () => {
 
     // Handle checkout
     const handleCheckout = () => {
-        setLoading(true);
-        const orderDetails = {
-            items: cartItems,
-            total: calculateTotal(),
-            itemCount: getTotalItems(),
-            timestamp: new Date().toISOString()
-        };
-        
-        navigate('/checkout', { state: { orderDetails } });
+        try {
+            setLoading(true);
+            const orderDetails = {
+                items: cartItems,
+                total: calculateTotal(),
+                itemCount: getTotalItems(),
+                timestamp: new Date().toISOString()
+            };
+            navigate('/checkout', { state: { orderDetails } });
+        } catch (error) {
+            toast.error('An error occurred during checkout. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     // Handle continue shopping

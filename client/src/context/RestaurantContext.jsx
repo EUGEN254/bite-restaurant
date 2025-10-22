@@ -95,17 +95,15 @@ export const RestaurantContextProvider = (props) => {
 
       if (existingItemIndex >= 0) {
         // Item already exists - increase quantity
-        const updatedCart = prev.map((item, index) =>
+        return prev.map((item, index) =>
           index === existingItemIndex
             ? { ...item, quantity: (item.quantity || 1) + 1 }
             : item
         );
-        return updatedCart;
-      } else {
-        // Item doesn't exist - add new item with quantity 1
-        const updatedCart = [...prev, { ...foodItem, quantity: 1 }];
-        return updatedCart;
       }
+
+      // Item doesn't exist - add new item with quantity 1
+      return [...prev, { ...foodItem, quantity: 1 }];
     });
   };
 
@@ -146,7 +144,6 @@ export const RestaurantContextProvider = (props) => {
   /*--------------------
         HOTEL BOOKING
   ---------------------------------*/
-
   // Set hotel for booking
   const addHotel = (hotel) => {
     setHotel(hotel);
@@ -454,7 +451,7 @@ export const RestaurantContextProvider = (props) => {
     setCalculatedNights,
     handleRoomsBlur,
 
-    // Reservation management - NEW
+    // Reservation management 
     reservation,
     setReservation,
     addReservation,

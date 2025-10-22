@@ -16,25 +16,20 @@ const Header = () => {
     <div className="flex flex-col lg:flex-row gap-8 lg:gap-5 items-center lg:items-start mt-10 lg:mt-20 px-5 lg:px-20 animate-fade-in">
       {/* Text Content Section */}
       <div className="lg:w-1/2 flex flex-col justify-center items-start w-full">
-        <div>
-          <img alt="" />
-        </div>
+     
         <p className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-medium leading-tight text-left w-full">
           We Serve the Taste <br />
           You Love 😍
         </p>
         <p className="my-4 lg:my-5 text-gray-600 text-sm lg:text-base max-w-2xl lg:w-[80vh] text-left w-full">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos
-          architecto molestiae, distinctio saepe ab quod reiciendis accusamus,
-          iure, sunt consequatur temporibus possimus facilis ex deleniti autem
-          delectus cum officiis explicabo!
+          Indulge in a culinary journey where every dish is crafted with passion and precision to delight your taste buds.
         </p>
         <div className="flex flex-row gap-3 lg:gap-4 justify-start w-full">
           <button 
           onClick={()=>navigate('/menu')}
           className="flex items-center gap-2 bg-amber-400 px-6 lg:px-8 py-3 rounded-full text-black hover:scale-95 lg:hover:scale-90 transition-all duration-300 text-sm lg:text-base whitespace-nowrap">
             Explore Food
-            <img className="w-3" src={assets.arrow_icon} alt="" />
+            <img className="w-3" src={assets.arrow_icon} alt="Arrow icon" />
           </button>
           <button className="flex items-center gap-2 bg-white px-6 lg:px-8 py-3 rounded-full text-black border-2 border-amber-400 hover:scale-95 lg:hover:scale-90 transition-all duration-300 text-sm lg:text-base whitespace-nowrap">
             <FaSearch className="text-sm" /> Search Your Food

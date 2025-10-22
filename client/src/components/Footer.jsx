@@ -32,10 +32,7 @@ const Footer = () => {
             </span>
           </div>
           <p className="text-gray-600 leading-relaxed max-w-sm">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Vero quam
-            doloribus libero. Ducimus eos dolor autem? Iure ducimus nobis
-            similique eius iste sed praesentium sit magnam incidunt quae!
-            Molestiae, temporibus?
+            Experience the best dining with us. Our team is dedicated to providing top-notch service and unforgettable meals.
           </p>
         </div>
 

@@ -63,6 +63,7 @@ const Testimonials = () => {
           <div 
             key={index}
             className="flex-shrink-0 w-80 bg-gradient-to-br from-white to-amber-50 p-6 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-amber-100"
+            aria-hidden={index !== 0}
           >
             {/* Quote Icon */}
             <div className="text-amber-400 mb-4">

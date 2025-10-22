@@ -75,6 +75,7 @@ const PopularDishes = () => {
               <img
                 src={food.image}
                 alt={food.name}
+                loading="lazy"
                 className="w-full h-48 object-cover rounded-2xl"
               />
             </div>
@@ -94,7 +95,7 @@ const PopularDishes = () => {
                 <div className="flex-shrink-0">
                   <button 
                   onClick={() => handleOrderNow(food)}
-                  className="whitespace-nowrap bg-gradient-to-b from-[#f8eee2] via-[#f7dece] to-white border-2 border-amber-300 px-4 py-2 rounded-full font-medium hover:bg-amber-400 transition-all duration-300 cursor-pointer text-sm">
+                  className="whitespace-nowrap bg-amber-100 border-2 border-amber-300 px-4 py-2 rounded-full font-medium hover:bg-amber-400 hover:text-white transition-all duration-300 cursor-pointer text-sm">
                     Order Now
                   </button>
                 </div>

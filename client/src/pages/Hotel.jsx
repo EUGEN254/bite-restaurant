@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { counties, hotel } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
 import { useRestaurant } from "../context/RestaurantContext";
@@ -17,28 +17,27 @@ const Hotel = () => {
    const { addHotel} = useRestaurant();
 
   // filtering logic
-  const filteredHotels = hotel.filter((item) => {
-    // city filter
-    const cityMatch = selectedCity ? item.address === selectedCity : true;
-    // hotel name filter
-    const hotelMatch = selectedHotel ? item.name === selectedHotel : true;
-    // price filter
-    const priceMatch = item.pricePerNight <= priceRange;
-
-    // all conditions
-    return cityMatch && hotelMatch && priceMatch;
-  });
+  const filteredHotels = useMemo(() => {
+    return hotel.filter((item) => {
+        const cityMatch = selectedCity ? item.address === selectedCity : true;
+        const hotelMatch = selectedHotel ? item.name === selectedHotel : true;
+        const priceMatch = item.pricePerNight <= priceRange;
+        return cityMatch && hotelMatch && priceMatch;
+    });
+  }, [selectedCity, selectedHotel, priceRange]);
 
   // sorting logic
-  const sortedHotels = [...filteredHotels].sort((a, b) => {
-    if (sortOption === "priceLowToHigh") {
-      return a.pricePerNight - b.pricePerNight;
-    } else if (sortOption === "priceHighToLow") {
-      return b.pricePerNight - a.pricePerNight;
-    } else {
-      return 0; // default, no sorting
-    }
-  });
+  const sortedHotels = useMemo(() => {
+    return [...filteredHotels].sort((a, b) => {
+        if (sortOption === "priceLowToHigh") {
+            return a.pricePerNight - b.pricePerNight;
+        } else if (sortOption === "priceHighToLow") {
+            return b.pricePerNight - a.pricePerNight;
+        } else {
+            return 0;
+        }
+    });
+  }, [filteredHotels, sortOption]);
 
   const handleOrderHotel = (hotel) =>{
     addHotel(hotel)

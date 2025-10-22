@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaEnvelope, FaEye, FaEyeSlash, FaTimes } from 'react-icons/fa';
 import { MdRestaurantMenu } from 'react-icons/md';
+import { toast } from 'react-toastify';
 
 const LoginSignUp = ({ setShowLogin }) => {
   const navigate = useNavigate();
@@ -21,10 +22,11 @@ const LoginSignUp = ({ setShowLogin }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!isLogin && formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match!');
+      toast.error('Passwords do not match!');
       return;
     }
     console.log(isLogin ? 'Login:' : 'Signup:', formData);
+    toast.success(isLogin ? 'Login successful!' : 'Signup successful!');
     setShowLogin(false);
     navigate('/');
   };
