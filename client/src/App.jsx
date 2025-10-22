@@ -9,11 +9,13 @@ import Home from "./pages/Home";
 import Menu from "./pages/Menu";
 import Cart from "./pages/Cart";
 import NotFound from "./pages/NotFound";
+import Notification from "./pages/Notification";
+import Payment from "./pages/Payment";
+import LoginSignUp from "./components/LoginSignUp";
 
 // 🟡 HEAVY/LESS USED - Lazy load these
 const Hotel = React.lazy(() => import("./pages/Hotel"));
 const Reservation = React.lazy(() => import("./pages/Reservation"));
-const Payment = React.lazy(() => import("./pages/Payment"));
 const HotelCheckOut = React.lazy(() => import("./pages/HotelCheckOut"));
 const MyReservations = React.lazy(() => import("./pages/MyReservations"));
 const Blogs = React.lazy(() => import("./pages/Blogs"));
@@ -23,7 +25,6 @@ const AboutUs = React.lazy(() => import("./components/AboutUs"));
 const Testimonials = React.lazy(() => import("./components/Testimonials"));
 const MoreAboutUs = React.lazy(() => import("./pages/MoreAboutUs"));
 const Contact = React.lazy(() => import("./pages/Contact"));
-const Notification = React.lazy(() => import("./pages/Notification"));
 
 const App = () => {
   const location = useLocation();

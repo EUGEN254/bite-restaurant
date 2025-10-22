@@ -46,7 +46,7 @@ const AboutUs = () => {
         </div>
 
         <div className="text-sm text-gray-600">
-          <ul className="flex flex-col lg:flex-row gap-8 lg:gap-20">
+        <ul className="grid grid-cols-2 md:grid-cols-3 gap-3 lg:gap-4">
             {services.map((service, index) => (
               <li key={index} className="flex items-center gap-3">
                 <service.icon className="text-amber-500 text-lg" />
