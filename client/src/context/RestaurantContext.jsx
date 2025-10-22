@@ -37,7 +37,23 @@ export const RestaurantContextProvider = (props) => {
     };
   });
 
-  // Save all hotel-related data to localStorage whenever they change
+  // Reservation management - NEW
+  const [reservation, setReservation] = useState(() => {
+    const savedReservation = localStorage.getItem("restaurant_reservation");
+    return savedReservation ? JSON.parse(savedReservation) : null;
+  });
+
+  const [reservationDetails, setReservationDetails] = useState(() => {
+    const savedReservationDetails = localStorage.getItem("restaurant_reservationDetails");
+    return savedReservationDetails ? JSON.parse(savedReservationDetails) : {
+      date: "",
+      time: "",
+      guests: 2,
+      requests: "",
+    };
+  });
+
+  // Save all data to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem("restaurant_cart", JSON.stringify(cartItems));
   }, [cartItems]);
@@ -57,6 +73,18 @@ export const RestaurantContextProvider = (props) => {
   useEffect(() => {
     localStorage.setItem("restaurant_calculatedNights", calculatedNights.toString());
   }, [calculatedNights]);
+
+  useEffect(() => {
+    if (reservation) {
+      localStorage.setItem("restaurant_reservation", JSON.stringify(reservation));
+    } else {
+      localStorage.removeItem("restaurant_reservation");
+    }
+  }, [reservation]);
+
+  useEffect(() => {
+    localStorage.setItem("restaurant_reservationDetails", JSON.stringify(reservationDetails));
+  }, [reservationDetails]);
 
   // Add item to cart
   const addToCart = (foodItem) => {
@@ -124,7 +152,7 @@ export const RestaurantContextProvider = (props) => {
     setHotel(hotel);
   };
 
-  // Clear hotel booking data (useful when booking is completed)
+  // Clear hotel booking data
   const clearHotelBooking = () => {
     setHotel(null);
     setBookingDetails({
@@ -145,7 +173,7 @@ export const RestaurantContextProvider = (props) => {
     return hotel.pricePerNight * nights * bookingDetails.rooms;
   };
 
-  // Handle input changes
+  // Handle input changes for hotel
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setBookingDetails((prev) => ({
@@ -157,11 +185,9 @@ export const RestaurantContextProvider = (props) => {
   // Handle number input for guests with validation
   const handleGuestsChange = (e) => {
     const value = e.target.value;
-    
-    // Allow user to type freely, validate on blur
     setBookingDetails((prev) => ({
       ...prev,
-      guests: value, // Store as string temporarily
+      guests: value,
     }));
   };
 
@@ -220,7 +246,7 @@ export const RestaurantContextProvider = (props) => {
     }
   };
 
-  // Handle booking confirmation - NOW GOES TO PAYMENT PAGE
+  // Handle hotel booking confirmation
   const handleConfirmBooking = () => {
     if (!hotel) {
       alert("No hotel selected");
@@ -237,9 +263,8 @@ export const RestaurantContextProvider = (props) => {
       return;
     }
 
-    // Create booking summary
     const bookingSummary = {
-      type: "hotel", // Differentiate from food orders
+      type: "hotel",
       hotel: hotel,
       bookingDetails: bookingDetails,
       total: calculateTotalHotel(),
@@ -248,21 +273,18 @@ export const RestaurantContextProvider = (props) => {
       nights: calculatedNights,
     };
 
-    // Navigate to payment page with booking details
     navigate("/checkout", {
       state: {
         orderDetails: {
-          items: [
-            {
-              _id: hotel._id,
-              name: hotel.name,
-              image: hotel.image,
-              price: calculateTotalHotel(),
-              quantity: 1,
-              type: "hotel_booking",
-              bookingDetails: bookingDetails,
-            },
-          ],
+          items: [{
+            _id: hotel._id,
+            name: hotel.name,
+            image: hotel.image,
+            price: calculateTotalHotel(),
+            quantity: 1,
+            type: "hotel_booking",
+            bookingDetails: bookingDetails,
+          }],
           total: calculateTotalHotel(),
           itemCount: 1,
           timestamp: new Date().toISOString(),
@@ -272,9 +294,118 @@ export const RestaurantContextProvider = (props) => {
     });
   };
 
-  // Handle go back
+  /*--------------------
+        RESERVATION MANAGEMENT - NEW
+  ---------------------------------*/
+
+  // Set table for reservation
+  const addReservation = (table) => {
+    setReservation({ ...table, currentSeats: table.currentSeats || 2 });
+  };
+
+  // Clear reservation data
+  const clearReservation = () => {
+    setReservation(null);
+    setReservationDetails({
+      date: "",
+      time: "",
+      guests: 2,
+      requests: "",
+    });
+  };
+
+  // Handle reservation input changes
+  const handleReservationInputChange = (e) => {
+    const { name, value } = e.target;
+    setReservationDetails((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Handle guest count change for reservation
+  const handleReservationGuestsChange = (value) => {
+    setReservationDetails((prev) => ({
+      ...prev,
+      guests: value,
+    }));
+  };
+
+  // Adjust seats for selected table
+  const adjustReservationSeats = (adjustment) => {
+    if (!reservation) return;
+
+    setReservation((prev) => {
+      if (!prev) return prev;
+
+      const newSeats = prev.currentSeats + adjustment;
+      if (newSeats >= 1 && newSeats <= prev.maxSeats) {
+        return { ...prev, currentSeats: newSeats };
+      }
+      return prev;
+    });
+  };
+
+  // Calculate reservation total
+  const calculateReservationTotal = () => {
+    if (!reservation) return 0;
+    const subtotal = reservation.price;
+    const serviceFee = 150;
+    const tax = subtotal * 0.16;
+    return subtotal + serviceFee + tax;
+  };
+
+  // Handle reservation submission
+  const handleConfirmReservation = () => {
+    if (!reservation || !reservationDetails.date || !reservationDetails.time) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    const reservationSummary = {
+      type: 'reservation',
+      table: reservation,
+      reservationDetails: {
+        date: reservationDetails.date,
+        time: reservationDetails.time,
+        guests: reservationDetails.guests,
+        requests: reservationDetails.requests,
+        seats: reservation.currentSeats
+      },
+      total: calculateReservationTotal(),
+      reservationId: 'R' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+      reservedAt: new Date().toISOString()
+    };
+
+    navigate('/checkout', { 
+      state: { 
+        orderDetails: {
+          items: [{
+            _id: reservation.id,
+            name: `Table Reservation - ${reservation.name}`,
+            image: reservation.image,
+            price: calculateReservationTotal(),
+            quantity: 1,
+            type: 'table_reservation',
+            reservationDetails: reservationSummary.reservationDetails
+          }],
+          total: calculateReservationTotal(),
+          itemCount: 1,
+          timestamp: new Date().toISOString(),
+          reservationSummary: reservationSummary
+        }
+      } 
+    });
+  };
+
+  // Handle go back for hotel
   const handleGoBack = () => {
     navigate("/hotels");
+  };
+
+  // Handle go back for reservation
+  const handleReservationGoBack = () => {
+    navigate(-1);
   };
 
   // Get tomorrow's date for min check-out date
@@ -295,6 +426,7 @@ export const RestaurantContextProvider = (props) => {
   const value = {
     backendUrl,
     currSymbol,
+    
     // Cart functionality
     cartItems,
     addToCart,
@@ -321,6 +453,20 @@ export const RestaurantContextProvider = (props) => {
     handleGuestsBlur,
     setCalculatedNights,
     handleRoomsBlur,
+
+    // Reservation management - NEW
+    reservation,
+    setReservation,
+    addReservation,
+    clearReservation,
+    reservationDetails,
+    setReservationDetails,
+    handleReservationInputChange,
+    handleReservationGuestsChange,
+    adjustReservationSeats,
+    calculateReservationTotal,
+    handleConfirmReservation,
+    handleReservationGoBack,
   };
 
   return (

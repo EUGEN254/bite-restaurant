@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
   MdPeople,
@@ -9,35 +9,31 @@ import {
 } from "react-icons/md";
 import { FaChair, FaMinus, FaPlus, FaCheck } from "react-icons/fa";
 import { assets, tables } from "../assets/assets";
+import { useRestaurant } from "../context/RestaurantContext"; // ADD THIS
 
 const Reservation = () => {
   const navigate = useNavigate();
-  const [selectedTable, setSelectedTable] = useState(null);
-  const [reservationDate, setReservationDate] = useState("");
-  const [reservationTime, setReservationTime] = useState("");
-  const [guestCount, setGuestCount] = useState(2);
-  const [specialRequests, setSpecialRequests] = useState("");
+  const { 
+    reservation,
+    reservationDetails,
+    addReservation,
+    handleReservationInputChange,
+    handleReservationGuestsChange,
+    adjustReservationSeats,
+    calculateReservationTotal,
+    handleConfirmReservation,
+    handleReservationGoBack
+  } = useRestaurant(); // USE CONTEXT
 
   // Filter available tables
   const availableTables = tables.filter((table) => table.available);
 
-  // Handle seat adjustment
-  const adjustSeats = (tableId, adjustment) => {
-    setSelectedTable((prev) => {
-      if (!prev || prev.id !== tableId) return prev;
-
-      const newSeats = prev.currentSeats + adjustment;
-      if (newSeats >= 1 && newSeats <= prev.maxSeats) {
-        return { ...prev, currentSeats: newSeats };
-      }
-      return prev;
-    });
-  };
-
   // Render seat icons
   const renderSeats = (table, isSelected = false) => {
     const seats = [];
-    for (let i = 0; i < table.currentSeats; i++) {
+    const seatsToShow = isSelected ? table.currentSeats : table.currentSeats;
+    
+    for (let i = 0; i < seatsToShow; i++) {
       seats.push(
         <div
           key={i}
@@ -54,69 +50,13 @@ const Reservation = () => {
     return seats;
   };
 
-  // Calculate total price with service fee and tax
-  const calculateTotal = () => {
-    if (!selectedTable) return 0;
-    const subtotal = selectedTable.price;
-    const serviceFee = 150; // Reservation service fee
-    const tax = subtotal * 0.16; // 16% tax
-    return subtotal + serviceFee + tax;
-  };
-
-  // Handle reservation submission - NOW GOES TO PAYMENT PAGE
-  const handleReservation = (e) => {
-    e.preventDefault();
-    if (!selectedTable || !reservationDate || !reservationTime) {
-      alert("Please fill in all required fields");
-      return;
-    }
-
-    // Create reservation summary
-    const reservationSummary = {
-      type: 'reservation',
-      table: selectedTable,
-      reservationDetails: {
-        date: reservationDate,
-        time: reservationTime,
-        guests: guestCount,
-        requests: specialRequests,
-        seats: selectedTable.currentSeats
-      },
-      total: calculateTotal(),
-      reservationId: 'R' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-      reservedAt: new Date().toISOString()
-    };
-
-    // Navigate to payment page with reservation details
-    navigate('/checkout', { 
-      state: { 
-        orderDetails: {
-          items: [{
-            _id: selectedTable.id,
-            name: `Table Reservation - ${selectedTable.name}`,
-            image: selectedTable.image,
-            price: calculateTotal(),
-            quantity: 1,
-            type: 'table_reservation',
-            reservationDetails: reservationSummary.reservationDetails
-          }],
-          total: calculateTotal(),
-          itemCount: 1,
-          timestamp: new Date().toISOString(),
-          // Add reservation specific data
-          reservationSummary: reservationSummary
-        }
-      } 
-    });
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-100 py-8 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <button
-            onClick={() => navigate(-1)}
+            onClick={handleReservationGoBack}
             className="flex items-center gap-2 text-amber-700 hover:text-amber-800 transition-colors"
           >
             <MdArrowBack className="text-xl" />
@@ -125,7 +65,7 @@ const Reservation = () => {
           <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 text-center">
             Reserve Your Table
           </h1>
-          <div className="w-20"></div> {/* Spacer for balance */}
+          <div className="w-20"></div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -142,13 +82,13 @@ const Reservation = () => {
                 <div
                   key={table.id}
                   className={`border-2 rounded-2xl p-4 cursor-pointer transition-all duration-300 hover:scale-105 ${
-                    selectedTable?.id === table.id
+                    reservation?.id === table.id
                       ? "border-amber-500 bg-amber-50 shadow-lg"
                       : "border-gray-200 hover:border-amber-300"
                   }`}
-                  onClick={() => setSelectedTable({ ...table })}
+                  onClick={() => addReservation(table)}
                 >
-                  {/* Table Image */}
+                  {/* Table content remains the same */}
                   <div className="relative mb-3">
                     <img
                       src={table.image}
@@ -160,29 +100,26 @@ const Reservation = () => {
                     </div>
                   </div>
 
-                  {/* Table Info */}
                   <div className="space-y-2">
                     <h3 className="font-semibold text-gray-800">
                       {table.name}
                     </h3>
                     <p className="text-sm text-gray-600">{table.description}</p>
 
-                    {/* Seat Configuration */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1">
-                        {renderSeats(table, selectedTable?.id === table.id)}
+                        {renderSeats(table, reservation?.id === table.id)}
                       </div>
                       <span className="text-sm text-gray-500">
                         Max: {table.maxSeats}
                       </span>
                     </div>
 
-                    {/* Price */}
                     <div className="flex items-center justify-between pt-2">
                       <span className="text-lg font-bold text-amber-600">
                         Kes {table.price}
                       </span>
-                      {selectedTable?.id === table.id && (
+                      {reservation?.id === table.id && (
                         <FaCheck className="text-green-500 text-xl" />
                       )}
                     </div>
@@ -199,7 +136,7 @@ const Reservation = () => {
               Reservation Details
             </h2>
 
-            <form onSubmit={handleReservation} className="space-y-6">
+            <form onSubmit={(e) => { e.preventDefault(); handleConfirmReservation(); }} className="space-y-6">
               {/* Date & Time */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -208,8 +145,9 @@ const Reservation = () => {
                   </label>
                   <input
                     type="date"
-                    value={reservationDate}
-                    onChange={(e) => setReservationDate(e.target.value)}
+                    name="date"
+                    value={reservationDetails.date}
+                    onChange={handleReservationInputChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
                     required
                     min={new Date().toISOString().split("T")[0]}
@@ -222,8 +160,9 @@ const Reservation = () => {
                   </label>
                   <input
                     type="time"
-                    value={reservationTime}
-                    onChange={(e) => setReservationTime(e.target.value)}
+                    name="time"
+                    value={reservationDetails.time}
+                    onChange={handleReservationInputChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
                     required
                   />
@@ -231,32 +170,30 @@ const Reservation = () => {
               </div>
 
               {/* Selected Table Controls */}
-              {selectedTable && (
+              {reservation && (
                 <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200">
                   <h3 className="font-semibold text-gray-800 mb-3">
-                    Adjust Seats for {selectedTable.name}
+                    Adjust Seats for {reservation.name}
                   </h3>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <button
                         type="button"
-                        onClick={() => adjustSeats(selectedTable.id, -1)}
-                        disabled={selectedTable.currentSeats <= 1}
+                        onClick={() => adjustReservationSeats(-1)}
+                        disabled={reservation.currentSeats <= 1}
                         className="p-2 rounded-full bg-white border border-amber-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-100 transition-colors"
                       >
                         <FaMinus className="text-amber-600" />
                       </button>
 
                       <div className="flex items-center gap-2">
-                        {renderSeats(selectedTable, true)}
+                        {renderSeats(reservation, true)}
                       </div>
 
                       <button
                         type="button"
-                        onClick={() => adjustSeats(selectedTable.id, 1)}
-                        disabled={
-                          selectedTable.currentSeats >= selectedTable.maxSeats
-                        }
+                        onClick={() => adjustReservationSeats(1)}
+                        disabled={reservation.currentSeats >= reservation.maxSeats}
                         className="p-2 rounded-full bg-white border border-amber-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-100 transition-colors"
                       >
                         <FaPlus className="text-amber-600" />
@@ -264,7 +201,7 @@ const Reservation = () => {
                     </div>
 
                     <span className="text-sm text-gray-600">
-                      {selectedTable.currentSeats} of {selectedTable.maxSeats} seats
+                      {reservation.currentSeats} of {reservation.maxSeats} seats
                     </span>
                   </div>
                 </div>
@@ -279,26 +216,24 @@ const Reservation = () => {
                 <div className="flex items-center gap-4">
                   <button
                     type="button"
-                    onClick={() =>
-                      setGuestCount((prev) => Math.max(1, prev - 1))
-                    }
+                    onClick={() => handleReservationGuestsChange(Math.max(1, reservationDetails.guests - 1))}
                     className="p-2 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 transition-colors"
                   >
                     <FaMinus />
                   </button>
                   <span className="text-lg font-semibold w-8 text-center">
-                    {guestCount}
+                    {reservationDetails.guests}
                   </span>
                   <button
                     type="button"
-                    onClick={() => setGuestCount((prev) => prev + 1)}
+                    onClick={() => handleReservationGuestsChange(reservationDetails.guests + 1)}
                     className="p-2 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 transition-colors"
                   >
                     <FaPlus />
                   </button>
                   <span className="text-sm text-gray-500 ml-2">
-                    {selectedTable
-                      ? `(Table seats: ${selectedTable.currentSeats})`
+                    {reservation
+                      ? `(Table seats: ${reservation.currentSeats})`
                       : "Select a table first"}
                   </span>
                 </div>
@@ -310,8 +245,9 @@ const Reservation = () => {
                   Special Requests
                 </label>
                 <textarea
-                  value={specialRequests}
-                  onChange={(e) => setSpecialRequests(e.target.value)}
+                  name="requests"
+                  value={reservationDetails.requests}
+                  onChange={handleReservationInputChange}
                   rows="4"
                   placeholder="Any special requirements, allergies, celebrations, or accessibility needs..."
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none"
@@ -319,13 +255,13 @@ const Reservation = () => {
               </div>
 
               {/* Price Summary */}
-              {selectedTable && (
+              {reservation && (
                 <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
                   <h3 className="font-semibold text-gray-800 mb-3">Price Summary</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>Table Reservation Fee:</span>
-                      <span>Kes {selectedTable.price}</span>
+                      <span>Kes {reservation.price}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Service Fee:</span>
@@ -333,31 +269,20 @@ const Reservation = () => {
                     </div>
                     <div className="flex justify-between">
                       <span>Tax (16%):</span>
-                      <span>Kes {(selectedTable.price * 0.16).toFixed(0)}</span>
+                      <span>Kes {(reservation.price * 0.16).toFixed(0)}</span>
                     </div>
                     <div className="flex justify-between pt-2 border-t border-amber-200 font-semibold text-lg">
                       <span>Total:</span>
-                      <span className="text-amber-600">Kes {calculateTotal()}</span>
+                      <span className="text-amber-600">Kes {calculateReservationTotal()}</span>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Important Information */}
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <h4 className="font-semibold text-blue-800 mb-2">Reservation Policy:</h4>
-                <ul className="text-blue-700 text-sm space-y-1">
-                  <li>• Reservation fee is non-refundable but can be rescheduled</li>
-                  <li>• Please arrive 15 minutes before your reservation time</li>
-                  <li>• Table will be held for 15 minutes past reservation time</li>
-                  <li>• Contact us for large group reservations (8+ people)</li>
-                </ul>
-              </div>
-
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={!selectedTable || !reservationDate || !reservationTime}
+                disabled={!reservation || !reservationDetails.date || !reservationDetails.time}
                 className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-4 rounded-xl font-semibold text-lg hover:from-amber-600 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 shadow-lg"
               >
                 Proceed to Payment

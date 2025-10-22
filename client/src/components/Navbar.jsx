@@ -49,6 +49,12 @@ const Navbar = ({ setShowLogin }) => {
             </li>
             <hr className="border-none outline-none h-0.5 bg-amber-500 w-3/5 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </NavLink>
+          <NavLink to="/reservation" className="group">
+            <li className="group-hover:text-amber-600 transition-colors duration-300">
+              Reservations
+            </li>
+            <hr className="border-none outline-none h-0.5 bg-amber-500 w-3/5 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </NavLink>
           <NavLink to="/blogs" className="group">
             <li className="group-hover:text-amber-600 transition-colors duration-300">
               Blogs
