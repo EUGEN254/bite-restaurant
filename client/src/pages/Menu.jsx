@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { food_list, menu_list } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
+import { useRestaurant } from "../context/RestaurantContext";
 
 const Menu = () => {
   const navigate = useNavigate()
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortOption, setSortOption] = useState("default");
   const [priceRange, setPriceRange] = useState(50); // Max price filter
+  const { addToCart } = useRestaurant();
 
   // Filter food items based on selected category and price
   const filteredFoodList = food_list.filter(food => {
@@ -36,6 +38,14 @@ const Menu = () => {
 
   // Get max price for range slider
   const maxPrice = Math.max(...food_list.map(food => food.price));
+
+
+   // Updated Order Now handler
+   const handleOrderNow = (food) => {
+    addToCart(food); // Add to cart using context
+    navigate('/cart'); // Navigate to cart
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f8eee2] via-[#f7dece] to-white py-8 px-4">
@@ -231,10 +241,7 @@ const Menu = () => {
                         </span>
                       </div>
                       <button
-                       onClick={() => {
-                        navigate('/cart', { state: { food } });
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
+                         onClick={() => handleOrderNow(food)}
                        className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-2xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
                         Order Now
                       </button>
@@ -246,41 +253,6 @@ const Menu = () => {
           </div>
         )}
       </div>
-
-      {/* Custom styles for the range slider and scrollbar */}
-      <style jsx>{`
-        .slider::-webkit-slider-thumb {
-          appearance: none;
-          height: 20px;
-          width: 20px;
-          border-radius: 50%;
-          background: #f59e0b;
-          cursor: pointer;
-          border: 2px solid white;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        
-        .slider::-moz-range-thumb {
-          height: 20px;
-          width: 20px;
-          border-radius: 50%;
-          background: #f59e0b;
-          cursor: pointer;
-          border: 2px solid white;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        /* Hide scrollbar for Chrome, Safari and Opera */
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-
-        /* Hide scrollbar for IE, Edge and Firefox */
-        .scrollbar-hide {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
-        }
-      `}</style>
     </div>
   );
 };

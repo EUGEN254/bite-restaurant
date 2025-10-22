@@ -1,53 +1,37 @@
-import React, { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useRestaurant } from '../context/RestaurantContext'; // Make sure this import path is correct
 
 const Cart = () => {
-    const location = useLocation()
-    const navigate = useNavigate()
-    const { food } = location.state || {}
-    const [loading, setLoading] = useState(false)
-    const [cartItems, setCartItems] = useState(food ? [food] : []) 
-    console.log('Cart items:', cartItems)
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    
+    // Get cart data and functions from context
+    const { 
+        cartItems, 
+        updateQuantity, 
+        removeFromCart, 
+        calculateTotal,
+        getTotalItems 
+    } = useRestaurant();
 
-    // Handle quantity changes
-    const updateQuantity = (index, newQuantity) => {
-        if (newQuantity < 1) return
+    // Handle checkout
+    const handleCheckout = () => {
+        setLoading(true);
+        const orderDetails = {
+            items: cartItems,
+            total: calculateTotal(),
+            itemCount: getTotalItems(),
+            timestamp: new Date().toISOString()
+        };
         
-        setCartItems(prev => prev.map((item, i) => 
-            i === index ? { ...item, quantity: newQuantity } : item
-        ))
-    }
-
-    // Remove item from cart
-    const removeItem = (index) => {
-        setCartItems(prev => prev.filter((_, i) => i !== index))
-    }
-
-    // Calculate total price
-    const calculateTotal = () => {
-        return cartItems.reduce((total, item) => {
-            const quantity = item.quantity || 1
-            return total + (item.price * quantity)
-        }, 0)
-    }
-
-    // Handle checkout - pass all cart data to payment page
-const handleCheckout = () => {
-    setLoading(true)
-    const orderDetails = {
-      items: cartItems,
-      total: calculateTotal(),
-      itemCount: cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0),
-      timestamp: new Date().toISOString()
+        navigate('/checkout', { state: { orderDetails } });
     };
-  
-    navigate('/checkout', { state: { orderDetails } });
-  };
 
     // Handle continue shopping
     const handleContinueShopping = () => {
-        navigate(-1) // Going back to previous page
-    }
+        navigate('/menu');
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -86,8 +70,8 @@ const handleCheckout = () => {
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
                                     {cartItems.map((item, index) => {
-                                        const quantity = item.quantity || 1
-                                        const itemTotal = item.price * quantity
+                                        const quantity = item.quantity || 1;
+                                        const itemTotal = item.price * quantity;
                                         
                                         return (
                                             <tr key={index} className="hover:bg-gray-50 transition-colors">
@@ -137,7 +121,7 @@ const handleCheckout = () => {
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <button
-                                                        onClick={() => removeItem(index)}
+                                                        onClick={() => removeFromCart(index)}
                                                         className="text-red-500 hover:text-red-700 font-medium text-sm"
                                                     >
                                                         Remove
@@ -153,8 +137,8 @@ const handleCheckout = () => {
                         {/* Mobile Cards */}
                         <div className="md:hidden">
                             {cartItems.map((item, index) => {
-                                const quantity = item.quantity || 1
-                                const itemTotal = item.price * quantity
+                                const quantity = item.quantity || 1;
+                                const itemTotal = item.price * quantity;
                                 
                                 return (
                                     <div key={index} className="p-4 border-b border-gray-200">
@@ -187,7 +171,7 @@ const handleCheckout = () => {
                                                         </button>
                                                     </div>
                                                     <button
-                                                        onClick={() => removeItem(index)}
+                                                        onClick={() => removeFromCart(index)}
                                                         className="text-red-500 text-sm"
                                                     >
                                                         Remove
@@ -247,4 +231,4 @@ const handleCheckout = () => {
     )
 }
 
-export default Cart
+export default Cart;

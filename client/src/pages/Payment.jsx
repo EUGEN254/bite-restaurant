@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { MdArrowBack, MdCreditCard, MdSecurity, MdCheckCircle, MdPhoneIphone } from 'react-icons/md';
-import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaMobileAlt } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaMobileAlt, FaHotel, FaShoppingCart, FaChair } from 'react-icons/fa';
 
 const Payment = () => {
   const location = useLocation();
@@ -27,11 +27,112 @@ const Payment = () => {
     mpesaPhone: ''
   });
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   // If no order details, redirect back
   if (!orderDetails) {
     navigate('/cart');
     return null;
   }
+
+  // Determine the type of order and set dynamic text
+  const getOrderType = () => {
+    // Check if it's a hotel booking
+    if (orderDetails.bookingSummary || 
+        (orderDetails.items && orderDetails.items[0] && orderDetails.items[0].type === 'hotel_booking')) {
+      return 'hotel';
+    }
+    // Check if it's a table reservation
+    if (orderDetails.reservationSummary || 
+        (orderDetails.items && orderDetails.items[0] && orderDetails.items[0].type === 'table_reservation')) {
+      return 'reservation';
+    }
+    // Default to food/cart order
+    return 'cart';
+  };
+
+  const orderType = getOrderType();
+
+  // Dynamic text based on order type
+  const getBackButtonText = () => {
+    switch (orderType) {
+      case 'hotel':
+        return 'Back to Hotels';
+      case 'reservation':
+        return 'Back to Reservation';
+      default:
+        return 'Back to Cart';
+    }
+  };
+
+  const getBackButtonIcon = () => {
+    switch (orderType) {
+      case 'hotel':
+        return <FaHotel className="text-lg" />;
+      case 'reservation':
+        return <FaChair className="text-lg" />;
+      default:
+        return <FaShoppingCart className="text-lg" />;
+    }
+  };
+
+  const getBackButtonRoute = () => {
+    switch (orderType) {
+      case 'hotel':
+        return '/hotels';
+      case 'reservation':
+        return '/reservation';
+      default:
+        return '/cart';
+    }
+  };
+
+  const getOrderTitle = () => {
+    switch (orderType) {
+      case 'hotel':
+        return 'Hotel Booking';
+      case 'reservation':
+        return 'Table Reservation';
+      default:
+        return 'Food Order';
+    }
+  };
+
+  const getSuccessMessage = () => {
+    switch (orderType) {
+      case 'hotel':
+        return 'Your hotel booking has been confirmed! You will receive an email with booking details.';
+      case 'reservation':
+        return 'Your table reservation has been confirmed! We look forward to serving you.';
+      default:
+        return 'Your food order has been confirmed and will be prepared shortly. You will receive an email confirmation with order details.';
+    }
+  };
+
+  const getAddressLabel = () => {
+    switch (orderType) {
+      case 'hotel':
+        return 'Billing Address *';
+      case 'reservation':
+        return 'Contact Address *';
+      default:
+        return 'Delivery Address *';
+    }
+  };
+
+  const getAddressPlaceholder = () => {
+    switch (orderType) {
+      case 'hotel':
+        return 'Enter your billing address';
+      case 'reservation':
+        return 'Enter your contact address';
+      default:
+        return 'Enter your complete delivery address';
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -79,9 +180,23 @@ const Payment = () => {
 
   const calculateTotal = () => {
     const subtotal = orderDetails.total;
-    const serviceFee = 100;
+    let serviceFee = 100;
+    if (orderType === 'hotel') serviceFee = 200;
+    if (orderType === 'reservation') serviceFee = 150;
+    
     const tax = subtotal * 0.16;
     return subtotal + serviceFee + tax;
+  };
+
+  const getServiceFee = () => {
+    switch (orderType) {
+      case 'hotel':
+        return 200;
+      case 'reservation':
+        return 150;
+      default:
+        return 100;
+    }
   };
 
   if (paymentSuccess) {
@@ -92,17 +207,19 @@ const Payment = () => {
             <MdCheckCircle className="text-white text-4xl" />
           </div>
           <h2 className="text-3xl font-bold text-gray-800 mb-4">Payment Successful!</h2>
-          <p className="text-gray-600 mb-2">Thank you for your order</p>
+          <p className="text-gray-600 mb-2">
+            Thank you for your {orderType === 'hotel' ? 'booking' : orderType === 'reservation' ? 'reservation' : 'order'}
+          </p>
           <p className="text-gray-600 mb-4">
             Paid via: <span className="font-bold text-amber-600">
               {selectedPaymentMethod === 'card' ? 'Credit Card' : 'M-Pesa'}
             </span>
           </p>
-          <p className="text-gray-600 mb-6">Order Total: <span className="font-bold text-amber-600">Kes {calculateTotal().toFixed(0)}</span></p>
+          <p className="text-gray-600 mb-6">Total: <span className="font-bold text-amber-600">Kes {calculateTotal().toFixed(0)}</span></p>
           <div className="bg-green-50 rounded-xl p-4 mb-6">
             <p className="text-green-700 text-sm">
-              Your order has been confirmed and will be prepared shortly. 
-              You will receive an {selectedPaymentMethod === 'mpesa' ? 'SMS and ' : ''}email confirmation with order details.
+              {getSuccessMessage()}
+              {selectedPaymentMethod === 'mpesa' && orderType === 'cart' ? ' SMS and' : ''}
             </p>
           </div>
           <p className="text-gray-500 text-sm">Redirecting to home page...</p>
@@ -114,14 +231,15 @@ const Payment = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-100 py-8 px-4">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
+        {/* Header with Dynamic Back Button */}
         <div className="flex items-center justify-between mb-8">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate(getBackButtonRoute())}
             className="flex items-center gap-2 text-amber-700 hover:text-amber-800 transition-colors"
           >
             <MdArrowBack className="text-xl" />
-            <span>Back to Cart</span>
+            {getBackButtonIcon()}
+            <span>{getBackButtonText()}</span>
           </button>
           <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 text-center">
             Complete Your Payment
@@ -134,42 +252,101 @@ const Payment = () => {
           <div className="bg-white rounded-3xl shadow-xl p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
               <MdCheckCircle className="text-amber-500" />
-              Order Summary
+              {getOrderTitle()} Summary
             </h2>
 
             <div className="space-y-4 mb-6">
-              {orderDetails.items.map((item, index) => {
-                const quantity = item.quantity || 1;
-                const itemTotal = item.price * quantity;
-                
-                return (
-                  <div key={index} className="flex items-center gap-4 p-3 bg-amber-50 rounded-xl">
+              {orderType === 'hotel' ? (
+                // Hotel Booking Summary
+                <div className="p-4 bg-amber-50 rounded-xl">
+                  <div className="flex items-center gap-4 mb-3">
                     <img 
-                      src={item.image} 
-                      alt={item.name}
+                      src={orderDetails.items[0].image} 
+                      alt={orderDetails.items[0].name}
                       className="w-16 h-16 object-cover rounded-lg"
                     />
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-800">{item.name}</h3>
-                      <p className="text-sm text-gray-600">Quantity: {quantity}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-amber-600">Kes {item.price}</p>
-                      <p className="text-sm text-gray-600">Total: Kes {itemTotal}</p>
+                      <h3 className="font-semibold text-gray-800">{orderDetails.items[0].name}</h3>
+                      <p className="text-sm text-gray-600">Hotel Booking</p>
                     </div>
                   </div>
-                );
-              })}
+                  
+                  {/* Hotel Booking Details */}
+                  {orderDetails.bookingSummary && (
+                    <div className="text-sm text-gray-600 space-y-1 mt-3">
+                      <p><strong>Check-in:</strong> {new Date(orderDetails.bookingSummary.bookingDetails.checkIn).toLocaleDateString()}</p>
+                      <p><strong>Check-out:</strong> {new Date(orderDetails.bookingSummary.bookingDetails.checkOut).toLocaleDateString()}</p>
+                      <p><strong>Guests:</strong> {orderDetails.bookingSummary.bookingDetails.guests}</p>
+                      <p><strong>Rooms:</strong> {orderDetails.bookingSummary.bookingDetails.rooms}</p>
+                      <p><strong>Nights:</strong> {orderDetails.bookingSummary.nights}</p>
+                    </div>
+                  )}
+                </div>
+              ) : orderType === 'reservation' ? (
+                // Reservation Summary
+                <div className="p-4 bg-amber-50 rounded-xl">
+                  <div className="flex items-center gap-4 mb-3">
+                    <img 
+                      src={orderDetails.items[0].image} 
+                      alt={orderDetails.items[0].name}
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-800">{orderDetails.items[0].name}</h3>
+                      <p className="text-sm text-gray-600">Table Reservation</p>
+                    </div>
+                  </div>
+                  
+                  {/* Reservation Details */}
+                  {orderDetails.reservationSummary && (
+                    <div className="text-sm text-gray-600 space-y-1 mt-3">
+                      <p><strong>Date:</strong> {new Date(orderDetails.reservationSummary.reservationDetails.date).toLocaleDateString()}</p>
+                      <p><strong>Time:</strong> {orderDetails.reservationSummary.reservationDetails.time}</p>
+                      <p><strong>Guests:</strong> {orderDetails.reservationSummary.reservationDetails.guests}</p>
+                      <p><strong>Seats:</strong> {orderDetails.reservationSummary.reservationDetails.seats}</p>
+                      {orderDetails.reservationSummary.reservationDetails.requests && (
+                        <p><strong>Requests:</strong> {orderDetails.reservationSummary.reservationDetails.requests}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                // Food Order Summary
+                orderDetails.items.map((item, index) => {
+                  const quantity = item.quantity || 1;
+                  const itemTotal = item.price * quantity;
+                  
+                  return (
+                    <div key={index} className="flex items-center gap-4 p-3 bg-amber-50 rounded-xl">
+                      <img 
+                        src={item.image} 
+                        alt={item.name}
+                        className="w-16 h-16 object-cover rounded-lg"
+                      />
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-800">{item.name}</h3>
+                        <p className="text-sm text-gray-600">Quantity: {quantity}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-amber-600">Kes {item.price}</p>
+                        <p className="text-sm text-gray-600">Total: Kes {itemTotal}</p>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
 
             <div className="border-t border-gray-200 pt-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-600">Items ({orderDetails.itemCount})</span>
+                <span className="text-gray-600">
+                  {orderType === 'hotel' ? 'Booking Total' : orderType === 'reservation' ? 'Reservation Fee' : `Items (${orderDetails.itemCount})`}
+                </span>
                 <span className="text-gray-800">Kes {orderDetails.total}</span>
               </div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-gray-600">Service Fee</span>
-                <span className="text-gray-800">Kes 100</span>
+                <span className="text-gray-800">Kes {getServiceFee()}</span>
               </div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-gray-600">Tax (16%)</span>
@@ -309,7 +486,7 @@ const Payment = () => {
                 </div>
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Delivery Address *
+                    {getAddressLabel()}
                   </label>
                   <textarea
                     name="address"
@@ -318,7 +495,7 @@ const Payment = () => {
                     required
                     rows="3"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none"
-                    placeholder="Enter your complete delivery address"
+                    placeholder={getAddressPlaceholder()}
                   />
                 </div>
               </div>

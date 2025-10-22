@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { counties, hotel } from "../assets/assets";
+import { useNavigate } from "react-router-dom";
 
 const Hotel = () => {
   const [selectedCity, setSelectedCity] = useState("");
+  const navigate = useNavigate()
   const [selectedHotel, setSelectedHotel] = useState("");
   const [sortOption, setSortOption] = useState("default");
   const [cities, setCities] = useState([
@@ -176,9 +178,7 @@ const Hotel = () => {
                           <h2 className="text-2xl font-bold text-gray-800 mb-2">
                             {item.name}
                           </h2>
-                          <p className="text-gray-600 mb-1">
-                             {item.address}
-                          </p>
+                          <p className="text-gray-600 mb-1">{item.address}</p>
                           <div
                             className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                               item.isAvailable
@@ -218,9 +218,16 @@ const Hotel = () => {
                         </div>
                       </div>
                     </div>
-
                     {/* Book Button */}
                     <button
+                      onClick={() => {
+                        if (item.isAvailable) {
+                          navigate("/hotel-checkout", {
+                            state: { hotel: item },
+                          });
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }
+                      }}
                       className={`w-full mt-6 py-3 px-6 rounded-xl font-semibold transition-all duration-300 ${
                         item.isAvailable
                           ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 hover:scale-105"
@@ -272,30 +279,6 @@ const Hotel = () => {
           </div>
         )}
       </div>
-
-      {/* custom styles for the range slider */}
-      <style jsx>{`
-        .slider::-webkit-slider-thumb {
-          appearance: none;
-          height: 20px;
-          width: 20px;
-          border-radius: 50%;
-          background: #f59e0b;
-          cursor: pointer;
-          border: 2px solid white;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .slider::-moz-range-thumb {
-          height: 20px;
-          width: 20px;
-          border-radius: 50%;
-          background: #f59e0b;
-          cursor: pointer;
-          border: 2px solid white;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-      `}</style>
     </div>
   );
 };

@@ -54,7 +54,16 @@ const Reservation = () => {
     return seats;
   };
 
-  // Handle reservation submission
+  // Calculate total price with service fee and tax
+  const calculateTotal = () => {
+    if (!selectedTable) return 0;
+    const subtotal = selectedTable.price;
+    const serviceFee = 150; // Reservation service fee
+    const tax = subtotal * 0.16; // 16% tax
+    return subtotal + serviceFee + tax;
+  };
+
+  // Handle reservation submission - NOW GOES TO PAYMENT PAGE
   const handleReservation = (e) => {
     e.preventDefault();
     if (!selectedTable || !reservationDate || !reservationTime) {
@@ -62,17 +71,43 @@ const Reservation = () => {
       return;
     }
 
-    // Here you would typically send the reservation to your backend
-    console.log("Reservation Details:", {
+    // Create reservation summary
+    const reservationSummary = {
+      type: 'reservation',
       table: selectedTable,
-      date: reservationDate,
-      time: reservationTime,
-      guests: guestCount,
-      requests: specialRequests,
-    });
+      reservationDetails: {
+        date: reservationDate,
+        time: reservationTime,
+        guests: guestCount,
+        requests: specialRequests,
+        seats: selectedTable.currentSeats
+      },
+      total: calculateTotal(),
+      reservationId: 'R' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+      reservedAt: new Date().toISOString()
+    };
 
-    alert("Reservation confirmed! We look forward to serving you.");
-    navigate("/");
+    // Navigate to payment page with reservation details
+    navigate('/checkout', { 
+      state: { 
+        orderDetails: {
+          items: [{
+            _id: selectedTable.id,
+            name: `Table Reservation - ${selectedTable.name}`,
+            image: selectedTable.image,
+            price: calculateTotal(),
+            quantity: 1,
+            type: 'table_reservation',
+            reservationDetails: reservationSummary.reservationDetails
+          }],
+          total: calculateTotal(),
+          itemCount: 1,
+          timestamp: new Date().toISOString(),
+          // Add reservation specific data
+          reservationSummary: reservationSummary
+        }
+      } 
+    });
   };
 
   return (
@@ -195,7 +230,7 @@ const Reservation = () => {
                 </div>
               </div>
 
-              {/* Selected Table Controls - NOW ABOVE Guest Count */}
+              {/* Selected Table Controls */}
               {selectedTable && (
                 <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200">
                   <h3 className="font-semibold text-gray-800 mb-3">
@@ -204,6 +239,7 @@ const Reservation = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <button
+                        type="button"
                         onClick={() => adjustSeats(selectedTable.id, -1)}
                         disabled={selectedTable.currentSeats <= 1}
                         className="p-2 rounded-full bg-white border border-amber-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-100 transition-colors"
@@ -216,6 +252,7 @@ const Reservation = () => {
                       </div>
 
                       <button
+                        type="button"
                         onClick={() => adjustSeats(selectedTable.id, 1)}
                         disabled={
                           selectedTable.currentSeats >= selectedTable.maxSeats
@@ -233,7 +270,7 @@ const Reservation = () => {
                 </div>
               )}
 
-              {/* Guest Count - NOW BELOW Seat Controls */}
+              {/* Guest Count */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                   <MdPeople className="text-amber-500" />
@@ -261,7 +298,7 @@ const Reservation = () => {
                   </button>
                   <span className="text-sm text-gray-500 ml-2">
                     {selectedTable
-                      ? `(Available Table seats: ${selectedTable.currentSeats})`
+                      ? `(Table seats: ${selectedTable.currentSeats})`
                       : "Select a table first"}
                   </span>
                 </div>
@@ -276,38 +313,54 @@ const Reservation = () => {
                   value={specialRequests}
                   onChange={(e) => setSpecialRequests(e.target.value)}
                   rows="4"
-                  placeholder="Any special requirements, allergies, or celebrations..."
+                  placeholder="Any special requirements, allergies, celebrations, or accessibility needs..."
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all resize-none"
                 />
               </div>
 
-              {/* Selected Table Summary */}
+              {/* Price Summary */}
               {selectedTable && (
                 <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
-                  <h3 className="font-semibold text-gray-800 mb-2">
-                    Your Selection
-                  </h3>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-gray-600">{selectedTable.name}</p>
-                      <p className="text-sm text-gray-500">
-                        {selectedTable.currentSeats} seats configured
-                      </p>
+                  <h3 className="font-semibold text-gray-800 mb-3">Price Summary</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Table Reservation Fee:</span>
+                      <span>Kes {selectedTable.price}</span>
                     </div>
-                    <span className="text-lg font-bold text-amber-600">
-                      Kes {selectedTable.price}
-                    </span>
+                    <div className="flex justify-between">
+                      <span>Service Fee:</span>
+                      <span>Kes 150</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Tax (16%):</span>
+                      <span>Kes {(selectedTable.price * 0.16).toFixed(0)}</span>
+                    </div>
+                    <div className="flex justify-between pt-2 border-t border-amber-200 font-semibold text-lg">
+                      <span>Total:</span>
+                      <span className="text-amber-600">Kes {calculateTotal()}</span>
+                    </div>
                   </div>
                 </div>
               )}
 
+              {/* Important Information */}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <h4 className="font-semibold text-blue-800 mb-2">Reservation Policy:</h4>
+                <ul className="text-blue-700 text-sm space-y-1">
+                  <li>• Reservation fee is non-refundable but can be rescheduled</li>
+                  <li>• Please arrive 15 minutes before your reservation time</li>
+                  <li>• Table will be held for 15 minutes past reservation time</li>
+                  <li>• Contact us for large group reservations (8+ people)</li>
+                </ul>
+              </div>
+
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={!selectedTable}
+                disabled={!selectedTable || !reservationDate || !reservationTime}
                 className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-4 rounded-xl font-semibold text-lg hover:from-amber-600 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 shadow-lg"
               >
-                Confirm Reservation
+                Proceed to Payment
               </button>
             </form>
           </div>

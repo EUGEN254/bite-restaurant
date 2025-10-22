@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Footer from "./components/Footer";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import AboutUs from "./components/AboutUs";
 import Testimonials from "./components/Testimonials";
 import Menu from "./pages/Menu";
@@ -17,8 +17,18 @@ import LoginSignUp from "./components/LoginSignUp";
 import Notification from "./pages/Notification";
 import Cart from "./pages/Cart";
 import Payment from "./pages/Payment";
+import HotelCheckOut from "./pages/HotelCheckOut";
 
 const App = () => {
+
+  const location = useLocation();
+
+  // Scroll to top on every route change
+  useEffect(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [location.pathname]);
+
+
   const [showLogin, setShowLogin] = useState(false);
 
   // If showLogin is true, ONLY show the LoginSignUp component
@@ -58,6 +68,7 @@ const App = () => {
         <Route path="/notification" element={<Notification />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Payment />} />
+        <Route path="/hotel-checkout" element={<HotelCheckOut />} />
       </Routes>
 
       {/* Footer - Appears on all pages */}

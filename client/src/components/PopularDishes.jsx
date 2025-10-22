@@ -1,10 +1,12 @@
 import React, { useRef, useState } from "react";
 import { assets, food_list } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
+import { useRestaurant } from "../context/RestaurantContext";
 
 const PopularDishes = () => {
   const scrollContainerRef = useRef(null);
   const navigate = useNavigate()
+   const { addToCart } = useRestaurant();
 
   // Function to scroll left
   const scrollLeft = () => {
@@ -24,6 +26,14 @@ const PopularDishes = () => {
         behavior: 'smooth'
       });
     }
+  };
+
+
+   // Updated Order Now handler
+   const handleOrderNow = (food) => {
+    addToCart(food); // Add to cart using context
+    navigate('/cart'); // Navigate to cart
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -83,10 +93,7 @@ const PopularDishes = () => {
                 </div>
                 <div className="flex-shrink-0">
                   <button 
-                  onClick={() => {
-                    navigate('/cart', { state: { food } });
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
+                  onClick={() => handleOrderNow(food)}
                   className="whitespace-nowrap bg-gradient-to-b from-[#f8eee2] via-[#f7dece] to-white border-2 border-amber-300 px-4 py-2 rounded-full font-medium hover:bg-amber-400 transition-all duration-300 cursor-pointer text-sm">
                     Order Now
                   </button>
