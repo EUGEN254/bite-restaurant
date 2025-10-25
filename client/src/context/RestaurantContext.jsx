@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios'
 
 export const RestaurantContent = createContext(null);
 
@@ -7,6 +8,27 @@ export const RestaurantContextProvider = (props) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const currSymbol = "KES";
   const navigate = useNavigate();
+  const[user,setUser] = useState(null);
+
+  // getting user data
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/api/user/me`,{
+        withCredentials:true
+      });
+
+      if(response.data.success && response.data.user){
+        setUser(response.data.user)
+      }else{
+        setUser(null);
+      }
+      
+    } catch (error) {
+      console.error(error)
+    }
+    
+  }
+
 
   // Cart State Management
   const [cartItems, setCartItems] = useState(() => {
@@ -419,10 +441,18 @@ export const RestaurantContextProvider = (props) => {
     updateCalculatedNights(bookingDetails.checkIn, bookingDetails.checkOut);
   }, [bookingDetails.checkIn, bookingDetails.checkOut]);
 
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
+
   // All values that will be available to components
   const value = {
     backendUrl,
     currSymbol,
+    fetchCurrentUser,
+    user,
+    setUser,
     
     // Cart functionality
     cartItems,
