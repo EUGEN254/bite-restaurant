@@ -98,14 +98,14 @@ export const login = async (req, res) => {
     };
 
     if (rememberMe) {
-      cookieOptions.maxAge = 24 * 60 * 60 * 1000; // ✅ 1 day instead of 30 days
+      cookieOptions.maxAge = 24 * 60 * 60 * 1000; // 1day
     } else {
       // Session cookie: expires when browser closes
     }
 
     res.cookie("token", token, cookieOptions);
 
-    const { password: _, ...userWithoutPassword } = user._doc;
+    const { password: _, ...userWithoutPassword } = user._doc;//take all properties from users and remove password
 
     return res.status(200).json({
       success: true,
