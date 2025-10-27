@@ -121,6 +121,75 @@ export const login = async (req, res) => {
   }
 };
 
+// login admin
+export const loginAdmin = async (req, res) => {
+  try {
+    const { email, password, role } = req.body; 
+
+    // Perform validation checks
+    if (!email || !password || !role) {
+      return res.status(400).json({
+        success: false,
+        message: "Please fill in all credentials"
+      });
+    }
+
+    // Check if role is admin
+    if (role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Admin role required."
+      });
+    }
+
+    // Find admin 
+    const admin = await User.findOne({ email, role });
+    if (!admin) {
+      return res.status(400).json({
+        success: false,
+        message: "No admin account found with this email"
+      });
+    }
+
+    // Compare passwords
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: "Incorrect password"
+      });
+    }
+
+    // Generate token
+    const token = generateToken(admin._id);
+
+    // Set cookie
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      maxAge: 24 * 60 * 60 * 1000,
+    };
+
+    res.cookie("token", token, cookieOptions);
+
+    // Remove password from response
+    const { password: _, ...adminWithoutPassword } = admin._doc;
+
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+      admin: adminWithoutPassword
+    });
+  } catch (error) {
+    console.error("Login error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error, please try again later.",
+    });
+  }
+};
+
 export const getUserData = async (req, res) => {
   try {
     if (!req.user) {
@@ -142,6 +211,33 @@ export const getUserData = async (req, res) => {
     };
 
     res.json({ success: true, user: safeUser });
+  } catch (error) {
+    console.error("Error in getMe:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export const getAdminData = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const user = await User.findById(req.user._id).select("-password");
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User Not Found" });
+    }
+
+    // return the safe user
+    const safeAdmin = {
+      _id: user._id,
+      fullname: user.fullname,
+      email: user.email,
+    };
+
+    res.json({ success: true, user: safeAdmin });
   } catch (error) {
     console.error("Error in getMe:", error);
     res.status(500).json({ success: false, message: "Server error" });

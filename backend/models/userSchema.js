@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       validate: [validator.isEmail, "Invalid email"],
     },
+    role:{ type: String,default:"user"},
     password: { type: String, required: true },
   },
   { timestamps: true }

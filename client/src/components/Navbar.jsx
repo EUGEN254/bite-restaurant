@@ -234,12 +234,6 @@ const Navbar = ({ setShowLogin }) => {
             : "translate-x-full opacity-0 pointer-events-none"
         } md:hidden`}
       >
-        {/* Backdrop */}
-        <div
-          className="absolute inset-0 bg-black bg-opacity-50"
-          onClick={() => setShowMenu(false)}
-        />
-
         {/* Menu Panel */}
         <div className="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-white shadow-2xl flex flex-col">
           
