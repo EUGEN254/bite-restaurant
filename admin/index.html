@@ -1,3 +1,6 @@
+
+
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -5,9 +8,135 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Panel</title>
+    <style>
+      /* Preloader Styles */
+      #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+      }
+      
+      .preloader-logo {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #2c5530;
+        border-radius: 50%;
+        color: white;
+        font-weight: bold;
+        font-size: 24px;
+        box-shadow: 0 4px 12px rgba(44, 85, 48, 0.2);
+      }
+      
+      .preloader-text {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 18px;
+        color: #2c5530;
+        margin-bottom: 30px;
+        font-weight: 500;
+      }
+      
+      .preloader-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(44, 85, 48, 0.2);
+        border-top: 4px solid #2c5530;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* Hide preloader when loaded */
+      .loaded #preloader {
+        opacity: 0;
+        visibility: hidden;
+      }
+      
+      /* Main content styles */
+      #root {
+        opacity: 0;
+        transition: opacity 0.3s ease-in;
+      }
+      
+      .loaded #root {
+        opacity: 1;
+      }
+      
+      /* Demo admin panel styles */
+      .admin-panel {
+        padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      
+      .admin-header {
+        background-color: #2c5530;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+      
+      .admin-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      
+      .admin-card {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border: 1px solid #eaeaea;
+      }
+      
+      .admin-card h3 {
+        margin-top: 0;
+        color: #2c5530;
+      }
+    </style>
   </head>
   <body>
+    <!-- Preloader -->
+    <div id="preloader">
+      <div class="preloader-logo">BR</div>
+      <div class="preloader-text">Loading Admin Panel</div>
+      <div class="preloader-spinner"></div>
+    </div>
+
+    <!-- Main Content -->
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+
+    <script>
+      // Simulate loading process
+      window.addEventListener('load', function() {
+        // Add a small delay to ensure everything is loaded
+        setTimeout(function() {
+          document.body.classList.add('loaded');
+        }, 1500); // Adjust this time based on your actual loading needs
+      });
+      
+      // Fallback: if page takes too long, show content anyway
+      setTimeout(function() {
+        document.body.classList.add('loaded');
+      }, 5000);
+    </script>
   </body>
 </html>

@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import connectCloudinary from './configs/cloudinary.js';
 import connectDB from './configs/connectDB.js';
 import userRouter from './routes/userRouter.js';
+import dishRouter from './routes/dishRouter.js';
 
 // .......... express setup ..........
 const app = express();
@@ -35,6 +36,7 @@ app.get("/", (req, res) => {
 
 // ROUTES
 app.use("/api/user",userRouter)
+app.use("/api/dishes",dishRouter)
 
 // connect MongoDB
 await connectDB();

@@ -72,7 +72,9 @@ export const login = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email }).select("fullname email password");
+    const user = await User.findOne({ email }).select(
+      "fullname email password"
+    );
     if (!user) {
       return res.status(400).json({
         success: false,
@@ -105,7 +107,7 @@ export const login = async (req, res) => {
 
     res.cookie("token", token, cookieOptions);
 
-    const { password: _, ...userWithoutPassword } = user._doc;//take all properties from users and remove password
+    const { password: _, ...userWithoutPassword } = user._doc; //take all properties from users and remove password
 
     return res.status(200).json({
       success: true,
@@ -124,13 +126,13 @@ export const login = async (req, res) => {
 // login admin
 export const loginAdmin = async (req, res) => {
   try {
-    const { email, password, role } = req.body; 
+    const { email, password, role } = req.body;
 
     // Perform validation checks
     if (!email || !password || !role) {
       return res.status(400).json({
         success: false,
-        message: "Please fill in all credentials"
+        message: "Please fill in all credentials",
       });
     }
 
@@ -138,16 +140,16 @@ export const loginAdmin = async (req, res) => {
     if (role !== "admin") {
       return res.status(403).json({
         success: false,
-        message: "Access denied. Admin role required."
+        message: "Access denied. Admin role required.",
       });
     }
 
-    // Find admin 
+    // Find admin
     const admin = await User.findOne({ email, role });
     if (!admin) {
       return res.status(400).json({
         success: false,
-        message: "No admin account found with this email"
+        message: "No admin account found with this email",
       });
     }
 
@@ -156,7 +158,7 @@ export const loginAdmin = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({
         success: false,
-        message: "Incorrect password"
+        message: "Incorrect password",
       });
     }
 
@@ -179,7 +181,7 @@ export const loginAdmin = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Login successful",
-      admin: adminWithoutPassword
+      admin: adminWithoutPassword,
     });
   } catch (error) {
     console.error("Login error:", error.message);
@@ -244,10 +246,18 @@ export const getAdminData = async (req, res) => {
   }
 };
 
-
-export const logout = async (req,res)=> {
+export const logout = async (req, res) => {
   res.clearCookie("token");
   res.status(201).json({
-    success:true,message:"Loggod Out Successfully"
-  })
-}
+    success: true,
+    message: "Loggod Out Successfully",
+  });
+};
+
+export const logoutAdmin = async (req, res) => {
+  res.clearCookie("token");
+  res.status(201).json({
+    success: true,
+    message: "Loggod out succesfully",
+  });
+};

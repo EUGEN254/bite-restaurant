@@ -1,12 +1,12 @@
-import React, { useRef, useState } from "react";
-import { assets, food_list } from "../assets/assets";
+import React, { useRef,useEffect } from "react";
+import { assets} from "../assets/assets";
 import { useNavigate } from "react-router-dom";
 import { useRestaurant } from "../context/RestaurantContext";
 
 const PopularDishes = () => {
   const scrollContainerRef = useRef(null);
   const navigate = useNavigate()
-   const { addToCart } = useRestaurant();
+   const { addToCart,dishes,fetchDishes } = useRestaurant();
 
   // Function to scroll left
   const scrollLeft = () => {
@@ -35,6 +35,11 @@ const PopularDishes = () => {
     navigate('/cart'); // Navigate to cart
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  //getting all dishes
+  useEffect(()=>{
+    fetchDishes()
+  },[])
 
   return (
     <div className="relative">
@@ -65,7 +70,7 @@ const PopularDishes = () => {
         className="flex overflow-x-auto gap-6 mt-10 pr-6 scrollbar-hide scroll-smooth"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {food_list.map((food, index) => (
+        {dishes.map((food, index) => (
           <div
             key={index}
             className="flex-shrink-0 w-80 bg-gradient-to-b from-[#f8eee2] via-[#f7dece] to-white p-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer relative flex flex-col"

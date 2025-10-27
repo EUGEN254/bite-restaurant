@@ -17,21 +17,23 @@ const popularDishesSchema = new mongoose.Schema(
       min: 0
     },
     description: { 
-      type: String, 
-      required: true 
+      type: String,
+      default: "" 
     },
     category: { 
       type: String, 
       required: true,
       trim: true
-    }
+    },
+    isAvailable: {
+      type: Boolean,
+      default: true // Changed from false to true
+    },
   },
   {
     timestamps: true,
   }
 );
 
-
 const PopularDishes = mongoose.models.PopularDish || mongoose.model("PopularDish", popularDishesSchema);
-
 export default PopularDishes;

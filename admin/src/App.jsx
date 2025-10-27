@@ -7,18 +7,24 @@ import Adddish from "./pages/Adddish";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Dashboard from "./pages/Dashboard";
+import NotFound from "./components/NotFound";
+import Category from "./pages/Category";
+import Orders from "./pages/Orders";
+import Reservations from "./pages/Reservations";
+import StaffCustomers from "./pages/StaffCustomers";
+import Inventory from "./pages/Inventory";
+import Settings from "./pages/Settings";
+import Analytics from "./pages/Analytics";
 
 // Enhanced protect route wrapper
 const ProtectRoute = ({ children }) => {
-  const { admin } = useAdminContext(); // Get admin state from context
-  
+  const { admin } = useAdminContext(); 
   return admin ? children : <Navigate to="/" replace />;
 }
 
 // Public route redirect to admin if already logged in
 const PublicRoute = ({ children }) => {
-  const { admin } = useAdminContext(); // Get admin state from context
-  
+  const { admin } = useAdminContext(); 
   return !admin ? children : <Navigate to="/admin" replace />;
 }
 
@@ -54,7 +60,7 @@ const App = () => {
 
         {/* Protected Admin Routes */}
         <Route
-          path="/admin/*"
+          path="/admin"
           element={
             <ProtectRoute>
               <Home />
@@ -65,10 +71,17 @@ const App = () => {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="add-dish" element={<Adddish />} />
+          <Route path="category" element={<Category/>} />
+          <Route path="orders" element={<Orders/>} />
+          <Route path="reservations" element={<Reservations/>} />
+          <Route path="staff-customers" element={<StaffCustomers/>} />
+          <Route path="inventory" element={<Inventory/>} />
+          <Route path="analytics" element={<Analytics/>} />
+          <Route path="settings" element={<Settings/>} />
         </Route>
 
         {/* Fallback route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound/>} />
       </Routes>
     </>
   );

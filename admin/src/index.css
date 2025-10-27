@@ -1,2 +1,65 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap");
 @import "tailwindcss";
+
+
+
+/* Add this to your main CSS file */
+html, body {
+  font-family: "Fredoka", cursive;
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+  
+  #root {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px; /* Small width */
+  height: 6px; /* For horizontal scrollbars */
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-light);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    to bottom,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+  border-radius: 10px;
+  border: 2px solid var(--color-light);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    to bottom,
+    var(--color-secondary),
+    var(--color-dark)
+  );
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) var(--color-light);
+}
+
+/* Hide horizontal scrollbar but keep functionality */
+.hide-horizontal-scrollbar {
+  overflow-x: auto;
+}
+
+.hide-horizontal-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-horizontal-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}

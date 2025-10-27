@@ -1,34 +1,49 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios'
+import axios from "axios";
+import {toast} from 'react-toastify'
 
 export const RestaurantContent = createContext(null);
 
 export const RestaurantContextProvider = (props) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const [dishes, setDishes] = useState([]);
   const currSymbol = "KES";
   const navigate = useNavigate();
-  const[user,setUser] = useState(null);
+  const [user, setUser] = useState(null);
+
+  // Fetch all dishes from database
+  const fetchDishes = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/api/dishes/all-dishes`, {
+        withCredentials: true,
+      });
+
+      if (response.data.success) {
+        setDishes(response.data.dishes || []);
+      }
+    } catch (error) {
+      console.error("Error fetching dishes:", error);
+      toast.error("Failed to load dishes");
+    }
+  };
 
   // getting user data
   const fetchCurrentUser = async () => {
     try {
-      const response = await axios.get(`${backendUrl}/api/user/me`,{
-        withCredentials:true
+      const response = await axios.get(`${backendUrl}/api/user/me`, {
+        withCredentials: true,
       });
 
-      if(response.data.success && response.data.user){
-        setUser(response.data.user)
-      }else{
+      if (response.data.success && response.data.user) {
+        setUser(response.data.user);
+      } else {
         setUser(null);
       }
-      
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-    
-  }
-
+  };
 
   // Cart State Management
   const [cartItems, setCartItems] = useState(() => {
@@ -42,7 +57,7 @@ export const RestaurantContextProvider = (props) => {
     const savedNights = localStorage.getItem("restaurant_calculatedNights");
     return savedNights ? parseInt(savedNights) : 0;
   });
-  
+
   const [hotel, setHotel] = useState(() => {
     const savedHotel = localStorage.getItem("restaurant_hotel");
     return savedHotel ? JSON.parse(savedHotel) : null;
@@ -50,13 +65,15 @@ export const RestaurantContextProvider = (props) => {
 
   const [bookingDetails, setBookingDetails] = useState(() => {
     const savedBooking = localStorage.getItem("restaurant_bookingDetails");
-    return savedBooking ? JSON.parse(savedBooking) : {
-      checkIn: "",
-      checkOut: "",
-      guests: 1,
-      rooms: 1,
-      specialRequests: "",
-    };
+    return savedBooking
+      ? JSON.parse(savedBooking)
+      : {
+          checkIn: "",
+          checkOut: "",
+          guests: 1,
+          rooms: 1,
+          specialRequests: "",
+        };
   });
 
   // Reservation management - NEW
@@ -66,13 +83,17 @@ export const RestaurantContextProvider = (props) => {
   });
 
   const [reservationDetails, setReservationDetails] = useState(() => {
-    const savedReservationDetails = localStorage.getItem("restaurant_reservationDetails");
-    return savedReservationDetails ? JSON.parse(savedReservationDetails) : {
-      date: "",
-      time: "",
-      guests: 2,
-      requests: "",
-    };
+    const savedReservationDetails = localStorage.getItem(
+      "restaurant_reservationDetails"
+    );
+    return savedReservationDetails
+      ? JSON.parse(savedReservationDetails)
+      : {
+          date: "",
+          time: "",
+          guests: 2,
+          requests: "",
+        };
   });
 
   // Save all data to localStorage whenever they change
@@ -89,23 +110,35 @@ export const RestaurantContextProvider = (props) => {
   }, [hotel]);
 
   useEffect(() => {
-    localStorage.setItem("restaurant_bookingDetails", JSON.stringify(bookingDetails));
+    localStorage.setItem(
+      "restaurant_bookingDetails",
+      JSON.stringify(bookingDetails)
+    );
   }, [bookingDetails]);
 
   useEffect(() => {
-    localStorage.setItem("restaurant_calculatedNights", calculatedNights.toString());
+    localStorage.setItem(
+      "restaurant_calculatedNights",
+      calculatedNights.toString()
+    );
   }, [calculatedNights]);
 
   useEffect(() => {
     if (reservation) {
-      localStorage.setItem("restaurant_reservation", JSON.stringify(reservation));
+      localStorage.setItem(
+        "restaurant_reservation",
+        JSON.stringify(reservation)
+      );
     } else {
       localStorage.removeItem("restaurant_reservation");
     }
   }, [reservation]);
 
   useEffect(() => {
-    localStorage.setItem("restaurant_reservationDetails", JSON.stringify(reservationDetails));
+    localStorage.setItem(
+      "restaurant_reservationDetails",
+      JSON.stringify(reservationDetails)
+    );
   }, [reservationDetails]);
 
   // Add item to cart
@@ -213,7 +246,7 @@ export const RestaurantContextProvider = (props) => {
   // Validate guests on blur
   const handleGuestsBlur = (e) => {
     let value = parseInt(e.target.value);
-    
+
     if (isNaN(value) || value < 1) {
       value = 1;
     } else if (value > 20) {
@@ -238,7 +271,7 @@ export const RestaurantContextProvider = (props) => {
   // Validate rooms on blur
   const handleRoomsBlur = (e) => {
     let value = parseInt(e.target.value);
-    
+
     if (isNaN(value) || value < 1) {
       value = 1;
     } else if (value > 10) {
@@ -295,15 +328,17 @@ export const RestaurantContextProvider = (props) => {
     navigate("/checkout", {
       state: {
         orderDetails: {
-          items: [{
-            _id: hotel._id,
-            name: hotel.name,
-            image: hotel.image,
-            price: calculateTotalHotel(),
-            quantity: 1,
-            type: "hotel_booking",
-            bookingDetails: bookingDetails,
-          }],
+          items: [
+            {
+              _id: hotel._id,
+              name: hotel.name,
+              image: hotel.image,
+              price: calculateTotalHotel(),
+              quantity: 1,
+              type: "hotel_booking",
+              bookingDetails: bookingDetails,
+            },
+          ],
           total: calculateTotalHotel(),
           itemCount: 1,
           timestamp: new Date().toISOString(),
@@ -382,38 +417,41 @@ export const RestaurantContextProvider = (props) => {
     }
 
     const reservationSummary = {
-      type: 'reservation',
+      type: "reservation",
       table: reservation,
       reservationDetails: {
         date: reservationDetails.date,
         time: reservationDetails.time,
         guests: reservationDetails.guests,
         requests: reservationDetails.requests,
-        seats: reservation.currentSeats
+        seats: reservation.currentSeats,
       },
       total: calculateReservationTotal(),
-      reservationId: 'R' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-      reservedAt: new Date().toISOString()
+      reservationId:
+        "R" + Math.random().toString(36).substr(2, 9).toUpperCase(),
+      reservedAt: new Date().toISOString(),
     };
 
-    navigate('/checkout', { 
-      state: { 
+    navigate("/checkout", {
+      state: {
         orderDetails: {
-          items: [{
-            _id: reservation.id,
-            name: `Table Reservation - ${reservation.name}`,
-            image: reservation.image,
-            price: calculateReservationTotal(),
-            quantity: 1,
-            type: 'table_reservation',
-            reservationDetails: reservationSummary.reservationDetails
-          }],
+          items: [
+            {
+              _id: reservation.id,
+              name: `Table Reservation - ${reservation.name}`,
+              image: reservation.image,
+              price: calculateReservationTotal(),
+              quantity: 1,
+              type: "table_reservation",
+              reservationDetails: reservationSummary.reservationDetails,
+            },
+          ],
           total: calculateReservationTotal(),
           itemCount: 1,
           timestamp: new Date().toISOString(),
-          reservationSummary: reservationSummary
-        }
-      } 
+          reservationSummary: reservationSummary,
+        },
+      },
     });
   };
 
@@ -441,9 +479,9 @@ export const RestaurantContextProvider = (props) => {
     updateCalculatedNights(bookingDetails.checkIn, bookingDetails.checkOut);
   }, [bookingDetails.checkIn, bookingDetails.checkOut]);
 
-
   useEffect(() => {
     fetchCurrentUser();
+    fetchDishes();
   }, []);
 
   // All values that will be available to components
@@ -453,7 +491,11 @@ export const RestaurantContextProvider = (props) => {
     fetchCurrentUser,
     user,
     setUser,
-    
+
+    //dishes
+    fetchDishes,
+    dishes,
+
     // Cart functionality
     cartItems,
     addToCart,
@@ -481,7 +523,7 @@ export const RestaurantContextProvider = (props) => {
     setCalculatedNights,
     handleRoomsBlur,
 
-    // Reservation management 
+    // Reservation management
     reservation,
     setReservation,
     addReservation,
