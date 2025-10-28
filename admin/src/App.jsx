@@ -16,6 +16,7 @@ import Inventory from "./pages/Inventory";
 import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
 import Payments from "./pages/Payments";
+import HotelManagement from "./pages/HotelManagement";
 
 // Enhanced protect route wrapper
 const ProtectRoute = ({ children }) => {
@@ -75,6 +76,7 @@ const App = () => {
           <Route path="category" element={<Category/>} />
           <Route path="orders" element={<Orders/>} />
           <Route path="reservations" element={<Reservations/>} />
+          <Route path="hotels" element={<HotelManagement/>} />
           <Route path="staff-customers" element={<StaffCustomers/>} />
           <Route path="inventory" element={<Inventory/>} />
           <Route path="analytics" element={<Analytics/>} />

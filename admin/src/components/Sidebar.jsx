@@ -12,7 +12,8 @@ import {
   FaShoppingCart,
   FaCalendarAlt,
   FaBox,
-  FaMoneyBillWave
+  FaMoneyBillWave,
+  FaHome
 } from "react-icons/fa";
 import { useAdminContext } from "../context/AdminContext";
 
@@ -44,6 +45,11 @@ const Sidebar = ({ onLinkClick }) => {
       name: "Reservations", 
       path: "reservations", 
       icon: <FaCalendarAlt className="text-lg" /> 
+    },
+    { 
+      name: "HotelManagment", 
+      path: "hotels", 
+      icon: <FaHome className="text-lg" /> 
     },
     { 
       name: "Staff/Customers", 

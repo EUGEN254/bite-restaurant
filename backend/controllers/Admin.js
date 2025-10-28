@@ -2,6 +2,7 @@ import { v2 as cloudinary } from "cloudinary";
 import PopularDishes from "../models/popularDishesSchema.js";
 import User from "../models/userSchema.js";
 import Category from "../models/categorySchema.js";
+import Hotel from "../models/hotelSchema.js";
 
 // adding dish
 const addDish = async (req, res) => {
@@ -387,8 +388,347 @@ const deleteCategory = async (req, res) => {
   }
 };
 
+
+// Add new hotel
+ const addHotel = async (req, res) => {
+  try {
+    const {
+      name,
+      description,
+      address,
+      county,
+      pricePerNight,
+      amenities,
+      contactEmail,
+      contactPhone,
+      roomsAvailable,
+      isAvailable
+    } = req.body;
+
+    // Validation
+    if (!name || !address || !county || !pricePerNight) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, address, county, and price are required"
+      });
+    }
+
+    if (!req.files?.image) {
+      return res.status(400).json({
+        success: false,
+        message: "Hotel main image is required"
+      });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized"
+      });
+    }
+
+    // Check if hotel already exists
+    const existingHotel = await Hotel.findOne({ name: name.trim() });
+    if (existingHotel) {
+      return res.status(400).json({
+        success: false,
+        message: "Hotel with this name already exists"
+      });
+    }
+
+    // Upload main image to Cloudinary
+    const mainImageResult = await cloudinary.uploader.upload(req.files.image[0].path, {
+      folder: "hotels"
+    });
+
+    // Upload additional images if provided
+    let additionalImages = [];
+    if (req.files.images) {
+      for (const file of req.files.images) {
+        const result = await cloudinary.uploader.upload(file.path, {
+          folder: "hotels/rooms"
+        });
+        additionalImages.push(result.secure_url);
+      }
+    }
+
+    // Parse amenities if it's a string
+    let amenitiesArray = [];
+    if (amenities) {
+      if (typeof amenities === 'string') {
+        amenitiesArray = amenities.split(',').map(item => item.trim());
+      } else if (Array.isArray(amenities)) {
+        amenitiesArray = amenities;
+      }
+    }
+
+    const newHotel = new Hotel({
+      name: name.trim(),
+      description: description?.trim() || "",
+      address: address.trim(),
+      county: county.trim(),
+      pricePerNight: parseFloat(pricePerNight),
+      amenities: amenitiesArray,
+      image: mainImageResult.secure_url,
+      images: additionalImages,
+      contactEmail: contactEmail?.trim() || "",
+      contactPhone: contactPhone?.trim() || "",
+      roomsAvailable: parseInt(roomsAvailable) || 1,
+      isAvailable: isAvailable === "true" || isAvailable === true
+    });
+
+    const savedHotel = await newHotel.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Hotel added successfully",
+      hotel: savedHotel
+    });
+
+  } catch (error) {
+    console.error("Add hotel error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message
+    });
+  }
+};
+
+// Get all hotels
+const getAllHotels = async (req, res) => {
+  try {
+    const hotels = await Hotel.find().sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      hotels,
+      message: "Hotels fetched successfully",
+      count: hotels.length
+    });
+
+  } catch (error) {
+    console.error("Get all hotels error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch hotels",
+      error: error.message
+    });
+  }
+};
+
+// Get hotel by ID
+const getHotelById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const hotel = await Hotel.findById(id);
+    if (!hotel) {
+      return res.status(404).json({
+        success: false,
+        message: "Hotel not found"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      hotel
+    });
+
+  } catch (error) {
+    console.error("Get hotel by ID error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch hotel",
+      error: error.message
+    });
+  }
+};
+
+// Update hotel
+ const updateHotel = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      name,
+      description,
+      address,
+      county,
+      pricePerNight,
+      amenities,
+      contactEmail,
+      contactPhone,
+      roomsAvailable,
+      isAvailable
+    } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized"
+      });
+    }
+
+    const hotel = await Hotel.findById(id);
+    if (!hotel) {
+      return res.status(404).json({
+        success: false,
+        message: "Hotel not found"
+      });
+    }
+
+    // If name is being updated, check for duplicates
+    if (name && name.trim() !== hotel.name) {
+      const existingHotel = await Hotel.findOne({
+        name: name.trim(),
+        _id: { $ne: id }
+      });
+
+      if (existingHotel) {
+        return res.status(400).json({
+          success: false,
+          message: "Hotel with this name already exists"
+        });
+      }
+      hotel.name = name.trim();
+    }
+
+    // Update fields
+    if (description !== undefined) hotel.description = description.trim();
+    if (address) hotel.address = address.trim();
+    if (county) hotel.county = county.trim();
+    if (pricePerNight) hotel.pricePerNight = parseFloat(pricePerNight);
+    if (contactEmail !== undefined) hotel.contactEmail = contactEmail.trim();
+    if (contactPhone !== undefined) hotel.contactPhone = contactPhone.trim();
+    if (roomsAvailable !== undefined) hotel.roomsAvailable = parseInt(roomsAvailable);
+    if (isAvailable !== undefined) hotel.isAvailable = isAvailable === "true" || isAvailable === true;
+
+    // Parse amenities if provided
+    if (amenities !== undefined) {
+      let amenitiesArray = [];
+      if (typeof amenities === 'string') {
+        amenitiesArray = amenities.split(',').map(item => item.trim());
+      } else if (Array.isArray(amenities)) {
+        amenitiesArray = amenities;
+      }
+      hotel.amenities = amenitiesArray;
+    }
+
+    // Handle main image update
+    if (req.files?.image) {
+      // Delete old main image from Cloudinary
+      if (hotel.image) {
+        const publicId = hotel.image.split("/").pop().split(".")[0];
+        await cloudinary.uploader.destroy(`hotels/${publicId}`);
+      }
+
+      // Upload new main image
+      const result = await cloudinary.uploader.upload(req.files.image[0].path, {
+        folder: "hotels"
+      });
+      hotel.image = result.secure_url;
+    }
+
+    // Handle additional images update
+    if (req.files?.images) {
+      // Delete old additional images if needed
+      if (hotel.images && hotel.images.length > 0) {
+        for (const oldImage of hotel.images) {
+          const publicId = oldImage.split("/").pop().split(".")[0];
+          await cloudinary.uploader.destroy(`hotels/rooms/${publicId}`);
+        }
+      }
+
+      // Upload new additional images
+      let newImages = [];
+      for (const file of req.files.images) {
+        const result = await cloudinary.uploader.upload(file.path, {
+          folder: "hotels/rooms"
+        });
+        newImages.push(result.secure_url);
+      }
+      hotel.images = newImages;
+    }
+
+    const updatedHotel = await hotel.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Hotel updated successfully",
+      hotel: updatedHotel
+    });
+
+  } catch (error) {
+    console.error("Update hotel error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update hotel",
+      error: error.message
+    });
+  }
+};
+
+// Delete hotel
+ const deleteHotel = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized"
+      });
+    }
+
+    const hotel = await Hotel.findById(id);
+    if (!hotel) {
+      return res.status(404).json({
+        success: false,
+        message: "Hotel not found"
+      });
+    }
+
+    // Delete images from Cloudinary
+    if (hotel.image) {
+      const publicId = hotel.image.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(`hotels/${publicId}`);
+    }
+
+    if (hotel.images && hotel.images.length > 0) {
+      for (const image of hotel.images) {
+        const publicId = image.split("/").pop().split(".")[0];
+        await cloudinary.uploader.destroy(`hotels/rooms/${publicId}`);
+      }
+    }
+
+    await Hotel.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+      message: "Hotel deleted successfully",
+      hotelId: id
+    });
+
+  } catch (error) {
+    console.error("Delete hotel error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete hotel",
+      error: error.message
+    });
+  }
+};
+
 export {
   addDish,
+  addHotel,
+  getAllHotels,
+  updateHotel,
+  getHotelById,
+  deleteHotel,
   deleteDish,
   getAllDishes,
   updateDish,

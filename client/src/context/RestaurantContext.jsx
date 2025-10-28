@@ -1,17 +1,19 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {toast} from 'react-toastify'
+import { toast } from "react-toastify";
 
-export const RestaurantContent = createContext(null);
+export const RestaurantContext = createContext(null);
 
 export const RestaurantContextProvider = (props) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [dishes, setDishes] = useState([]);
+  const [hotels, setHotels] = useState([]);
+  const [categories, setCategories] = useState([]);
   const currSymbol = "KES";
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // Fetch all dishes from database
   const fetchDishes = async () => {
@@ -29,39 +31,59 @@ export const RestaurantContextProvider = (props) => {
     }
   };
 
-  //fectching categories
-   const fetchCategories = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(`${backendUrl}/api/categories`, {
-          withCredentials: true,
-        });
-  
-        if (response.data.success) {
-          // Transform the data to match your frontend format
-          const formattedCategories = response.data.data.map((cat) => ({
-            id: cat._id,
-            name: cat.name,
-            description: cat.description || "",
-            status: cat.status || "active",
-            dishesCount: cat.dishesCount || 0,
-            image:cat.image,
-            createdAt: cat.createdAt || new Date().toISOString().split("T")[0],
-          }));
-  
-          setCategories(formattedCategories);
-          return formattedCategories;
-        }
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        toast.error("Failed to fetch categories");
-        return [];
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Fetching categories
+  const fetchCategories = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${backendUrl}/api/categories`, {
+        withCredentials: true,
+      });
 
-  // getting user data
+      if (response.data.success) {
+        // Transform the data to match your frontend format
+        const formattedCategories = response.data.data.map((cat) => ({
+          id: cat._id,
+          name: cat.name,
+          description: cat.description || "",
+          status: cat.status || "active",
+          dishesCount: cat.dishesCount || 0,
+          image: cat.image,
+          createdAt: cat.createdAt || new Date().toISOString().split("T")[0],
+        }));
+
+        setCategories(formattedCategories);
+        return formattedCategories;
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      toast.error("Failed to fetch categories");
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch hotels
+  const fetchHotels = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${backendUrl}/api/hotels/all-hotels`, {
+        withCredentials: true,
+      });
+
+      if (response.data.success) {
+        setHotels(response.data.hotels || []);
+      }
+    } catch (error) {
+      console.error("Error fetching hotels:", error);
+      toast.error("Failed to load hotels");
+      setHotels([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Getting user data
   const fetchCurrentUser = async () => {
     try {
       const response = await axios.get(`${backendUrl}/api/user/me`, {
@@ -75,6 +97,7 @@ export const RestaurantContextProvider = (props) => {
       }
     } catch (error) {
       console.error(error);
+      setUser(null);
     }
   };
 
@@ -85,7 +108,6 @@ export const RestaurantContextProvider = (props) => {
   });
 
   // Hotel booking management - WITH LOCALSTORAGE PERSISTENCE
-  const [loading, setLoading] = useState(false);
   const [calculatedNights, setCalculatedNights] = useState(() => {
     const savedNights = localStorage.getItem("restaurant_calculatedNights");
     return savedNights ? parseInt(savedNights) : 0;
@@ -334,17 +356,17 @@ export const RestaurantContextProvider = (props) => {
   // Handle hotel booking confirmation
   const handleConfirmBooking = () => {
     if (!hotel) {
-      alert("No hotel selected");
+      toast.error("No hotel selected");
       return;
     }
 
     if (!bookingDetails.checkIn || !bookingDetails.checkOut) {
-      alert("Please select check-in and check-out dates");
+      toast.error("Please select check-in and check-out dates");
       return;
     }
 
     if (calculatedNights <= 0) {
-      alert("Check-out date must be after check-in date");
+      toast.error("Check-out date must be after check-in date");
       return;
     }
 
@@ -445,7 +467,7 @@ export const RestaurantContextProvider = (props) => {
   // Handle reservation submission
   const handleConfirmReservation = () => {
     if (!reservation || !reservationDetails.date || !reservationDetails.time) {
-      alert("Please fill in all required fields");
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -460,8 +482,7 @@ export const RestaurantContextProvider = (props) => {
         seats: reservation.currentSeats,
       },
       total: calculateReservationTotal(),
-      reservationId:
-        "R" + Math.random().toString(36).substr(2, 9).toUpperCase(),
+      reservationId: "R" + Math.random().toString(36).substr(2, 9).toUpperCase(),
       reservedAt: new Date().toISOString(),
     };
 
@@ -512,10 +533,12 @@ export const RestaurantContextProvider = (props) => {
     updateCalculatedNights(bookingDetails.checkIn, bookingDetails.checkOut);
   }, [bookingDetails.checkIn, bookingDetails.checkOut]);
 
+  // Fetch initial data
   useEffect(() => {
     fetchCurrentUser();
     fetchDishes();
     fetchCategories();
+    fetchHotels();
   }, []);
 
   // All values that will be available to components
@@ -526,11 +549,16 @@ export const RestaurantContextProvider = (props) => {
     user,
     setUser,
 
-    //dishes
+    // dishes
     fetchDishes,
     dishes,
     categories,
     fetchCategories,
+
+    // hotels
+    hotels,
+    setHotels,
+    fetchHotels,
 
     // Cart functionality
     cartItems,
@@ -572,18 +600,22 @@ export const RestaurantContextProvider = (props) => {
     calculateReservationTotal,
     handleConfirmReservation,
     handleReservationGoBack,
+
+    // Loading state
+    loading,
+    setLoading,
   };
 
   return (
-    <RestaurantContent.Provider value={value}>
+    <RestaurantContext.Provider value={value}>
       {props.children}
-    </RestaurantContent.Provider>
+    </RestaurantContext.Provider>
   );
 };
 
 // Custom hook to use the context
 export const useRestaurant = () => {
-  const context = useContext(RestaurantContent);
+  const context = useContext(RestaurantContext);
   if (!context) {
     throw new Error(
       "useRestaurant must be used within a RestaurantContextProvider"

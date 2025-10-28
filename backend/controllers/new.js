@@ -417,11 +417,154 @@
 
 
 
-// scripts/updateCategoryImages.js
+// // scripts/updateCategoryImages.js
+// import mongoose from "mongoose";
+// import dotenv from "dotenv";
+// import { v2 as cloudinary } from "cloudinary";
+// import Category from "../models/categorySchema.js";
+// import fs from "fs";
+// import path from "path";
+// import { fileURLToPath } from "url";
+
+// // Load environment variables
+// dotenv.config();
+
+// // Configure Cloudinary with hardcoded values
+
+
+// console.log("✅ Cloudinary configured");
+
+// // Get __dirname equivalent in ES modules
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+
+// // Your menu list data with category names and images
+// const menu_list = [
+//   {
+//     menu_name: "Salad",
+//     menu_image: "menu_1.png", // Adjust extension if needed
+//   },
+//   {
+//     menu_name: "Rolls",
+//     menu_image: "menu_2.png",
+//   },
+//   {
+//     menu_name: "Deserts",
+//     menu_image: "menu_3.png",
+//   },
+//   {
+//     menu_name: "Sandwich",
+//     menu_image: "menu_4.png",
+//   },
+//   {
+//     menu_name: "Cake",
+//     menu_image: "menu_5.png",
+//   },
+//   {
+//     menu_name: "Pure Veg",
+//     menu_image: "menu_6.png",
+//   },
+//   {
+//     menu_name: "Pasta",
+//     menu_image: "menu_7.png",
+//   },
+//   {
+//     menu_name: "Noodles",
+//     menu_image: "menu_8.png",
+//   },
+// ];
+
+// const updateCategoryImages = async () => {
+//   try {
+//     // Connect to MongoDB
+//     await mongoose.connect(``, {
+//       useNewUrlParser: true,
+//       useUnifiedTopology: true,
+//     });
+
+//     console.log("✅ Connected to MongoDB");
+
+//     let updatedCount = 0;
+//     let skippedCount = 0;
+
+//     // Process each menu item
+//     for (const menuItem of menu_list) {
+//       try {
+//         // Find the category by name
+//         const category = await Category.findOne({ 
+//           name: menuItem.menu_name 
+//         });
+
+//         if (!category) {
+//           console.log(`❌ Category not found: "${menuItem.menu_name}"`);
+//           skippedCount++;
+//           continue;
+//         }
+
+//         // Check if category already has an image
+//         if (category.image && category.image !== "") {
+//           console.log(`⏭️  Skipping "${menuItem.menu_name}" - already has image`);
+//           skippedCount++;
+//           continue;
+//         }
+
+//         // Path to menu images in frontend assets
+//         const imagePath = path.join(__dirname, '../../client/src/assets', menuItem.menu_image);
+        
+//         if (!fs.existsSync(imagePath)) {
+//           console.log(`❌ Image not found: ${imagePath}`);
+//           console.log(`   Looking for: ${menuItem.menu_image}`);
+//           skippedCount++;
+//           continue;
+//         }
+
+//         console.log(`📤 Uploading image for: ${menuItem.menu_name}`);
+        
+//         // Upload to Cloudinary
+//         const uploadResult = await cloudinary.uploader.upload(imagePath, {
+//           folder: "categories",
+//         });
+
+//         // Update category with image URL
+//         category.image = uploadResult.secure_url;
+//         await category.save();
+
+//         console.log(`✅ Updated: ${menuItem.menu_name}`);
+//         updatedCount++;
+
+//         // Small delay to avoid overwhelming Cloudinary
+//         await new Promise(resolve => setTimeout(resolve, 500));
+
+//       } catch (error) {
+//         console.error(`❌ Error processing "${menuItem.menu_name}":`, error.message);
+//       }
+//     }
+
+//     console.log("\n📊 Update Summary:");
+//     console.log(`✅ Updated: ${updatedCount} categories with images`);
+//     console.log(`⏭️  Skipped: ${skippedCount} categories`);
+//     console.log(`📝 Total processed: ${updatedCount + skippedCount}/${menu_list.length}`);
+
+//   } catch (error) {
+//     console.error("❌ Error in update process:", error.message);
+//   } finally {
+//     if (mongoose.connection.readyState !== 0) {
+//       await mongoose.disconnect();
+//       console.log("🔌 Disconnected from MongoDB");
+//     }
+//   }
+// };
+
+// // Run the script
+// updateCategoryImages();
+
+
+
+// scripts/seedHotels.js
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { v2 as cloudinary } from "cloudinary";
-import Category from "../models/categorySchema.js";
+import Hotel from "../models/hotelSchema.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -430,6 +573,11 @@ import { fileURLToPath } from "url";
 dotenv.config();
 
 // Configure Cloudinary with hardcoded values
+cloudinary.config({
+  cloud_name: "dmxvsiwev",
+  api_key: "414399732439977",
+  api_secret: "Wc22ADTWYrw2NkSiU3-48MDrrvI",
+});
 
 console.log("✅ Cloudinary configured");
 
@@ -437,115 +585,217 @@ console.log("✅ Cloudinary configured");
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Your menu list data with category names and images
-const menu_list = [
+// Your hotel data
+const hotels = [
   {
-    menu_name: "Salad",
-    menu_image: "menu_1.png", // Adjust extension if needed
+    name: "Sunrise Hotel",
+    image: "hotel1.png", // Adjust extension if needed
+    address: "Nairobi Central",
+    county: "Nairobi",
+    pricePerNight: 120,
+    amenities: ["Free WiFi", "Breakfast Included", "Swimming Pool"],
+    images: ["roomImg1.png", "roomImg2.png", "roomImg3.png", "roomImg4.png"],
+    isAvailable: true,
+    contactEmail: "info@sunrisehotel.com",
+    contactPhone: "+254712345678",
+    roomsAvailable: 10,
+    description: "Luxury hotel in the heart of Nairobi with premium amenities and excellent service."
   },
   {
-    menu_name: "Rolls",
-    menu_image: "menu_2.png",
+    name: "Oceanview Resort",
+    image: "hotel2.png",
+    address: "Beach Road, Nyali",
+    county: "Mombasa",
+    pricePerNight: 150,
+    amenities: ["Beach Access", "Spa Services", "Free Parking"],
+    images: ["roomImg2.png", "roomImg3.png", "roomImg4.png", "roomImg1.png"],
+    isAvailable: false,
+    contactEmail: "reservations@oceanviewresort.com",
+    contactPhone: "+254723456789",
+    roomsAvailable: 15,
+    description: "Beautiful beachfront resort with stunning ocean views and world-class amenities."
   },
   {
-    menu_name: "Deserts",
-    menu_image: "menu_3.png",
+    name: "Mountainview Inn",
+    image: "hotel3.png",
+    address: "Kisumu Hills",
+    county: "Kisumu",
+    pricePerNight: 100,
+    amenities: ["Hiking Trails", "Pet Friendly", "Free Breakfast"],
+    images: ["roomImg3.png", "roomImg4.png", "roomImg1.png", "roomImg2.png"],
+    isAvailable: true,
+    contactEmail: "stay@mountainviewinn.com",
+    contactPhone: "+254734567890",
+    roomsAvailable: 8,
+    description: "Cozy inn with breathtaking mountain views and nature trails."
   },
   {
-    menu_name: "Sandwich",
-    menu_image: "menu_4.png",
+    name: "City Center Lodge",
+    image: "hotel4.png",
+    address: "Nakuru Town",
+    county: "Nakuru",
+    pricePerNight: 130,
+    amenities: ["Central Location", "Free WiFi", "24/7 Front Desk"],
+    images: ["roomImg4.png", "roomImg1.png", "roomImg2.png", "roomImg3.png"],
+    isAvailable: true,
+    contactEmail: "bookings@citycenterlodge.com",
+    contactPhone: "+254745678901",
+    roomsAvailable: 12,
+    description: "Modern lodge in the city center with easy access to all attractions."
   },
   {
-    menu_name: "Cake",
-    menu_image: "menu_5.png",
+    name: "Lakeside Hotel",
+    image: "hotel5.png",
+    address: "Eldoret Lake Road",
+    county: "Eldoret",
+    pricePerNight: 110,
+    amenities: ["Lake View", "Free Breakfast", "Swimming Pool"],
+    images: ["roomImg1.png", "roomImg2.png", "roomImg3.png"],
+    isAvailable: false,
+    contactEmail: "hello@lakesidehotel.com",
+    contactPhone: "+254756789012",
+    roomsAvailable: 6,
+    description: "Serene hotel by the lake offering peaceful stays and beautiful scenery."
   },
   {
-    menu_name: "Pure Veg",
-    menu_image: "menu_6.png",
+    name: "Gardenview Suites",
+    image: "hotel6.png",
+    address: "Thika Greens",
+    county: "Thika",
+    pricePerNight: 140,
+    amenities: ["Garden Access", "Free WiFi", "Breakfast Included"],
+    images: ["roomImg1.png", "roomImg2.png", "roomImg3.png", "roomImg4.png"],
+    isAvailable: true,
+    contactEmail: "info@gardenviewsuites.com",
+    contactPhone: "+254767890123",
+    roomsAvailable: 20,
+    description: "Luxury suites surrounded by beautiful gardens and premium amenities."
   },
   {
-    menu_name: "Pasta",
-    menu_image: "menu_7.png",
-  },
-  {
-    menu_name: "Noodles",
-    menu_image: "menu_8.png",
-  },
+    name: "Sunset Resort",
+    image: "hotel7.png",
+    address: "Malindi Beach",
+    county: "Malindi",
+    pricePerNight: 160,
+    amenities: ["Beach Access", "Spa Services", "Free Parking"],
+    images: ["roomImg2.png", "roomImg3.png", "roomImg4.png", "roomImg1.png"],
+    isAvailable: true,
+    contactEmail: "reservations@sunsetresort.com",
+    contactPhone: "+254778901234",
+    roomsAvailable: 25,
+    description: "Premium beach resort with spectacular sunset views and luxury services."
+  }
 ];
 
-const updateCategoryImages = async () => {
+// Function to find image with different extensions
+const findImageWithExtensions = (baseName) => {
+  const extensions = ['.png', '.jpg', '.jpeg', '.webp', '.svg'];
+  for (const ext of extensions) {
+    const imagePath = path.join(__dirname, '../../frontend/assets', baseName + ext);
+    if (fs.existsSync(imagePath)) {
+      return imagePath;
+    }
+  }
+  return null;
+};
+
+const seedHotels = async () => {
   try {
     // Connect to MongoDB
-    await mongoose.connect(``, {
+    await mongoose.connect(`${process.env.MONGODB_URI}/bite-restaurant`, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
 
     console.log("✅ Connected to MongoDB");
 
-    let updatedCount = 0;
+    let addedCount = 0;
     let skippedCount = 0;
 
-    // Process each menu item
-    for (const menuItem of menu_list) {
+    // Process each hotel
+    for (const hotelData of hotels) {
       try {
-        // Find the category by name
-        const category = await Category.findOne({ 
-          name: menuItem.menu_name 
+        // Check if hotel already exists
+        const existingHotel = await Hotel.findOne({ 
+          name: hotelData.name 
         });
 
-        if (!category) {
-          console.log(`❌ Category not found: "${menuItem.menu_name}"`);
+        if (existingHotel) {
+          console.log(`⏭️  Skipping "${hotelData.name}" - already exists`);
           skippedCount++;
           continue;
         }
 
-        // Check if category already has an image
-        if (category.image && category.image !== "") {
-          console.log(`⏭️  Skipping "${menuItem.menu_name}" - already has image`);
-          skippedCount++;
-          continue;
-        }
-
-        // Path to menu images in frontend assets
-        const imagePath = path.join(__dirname, '../../client/src/assets', menuItem.menu_image);
+        // Upload main image to Cloudinary
+        console.log(`📤 Uploading main image for: ${hotelData.name}`);
+        const mainImagePath = findImageWithExtensions(hotelData.image.replace('.png', ''));
         
-        if (!fs.existsSync(imagePath)) {
-          console.log(`❌ Image not found: ${imagePath}`);
-          console.log(`   Looking for: ${menuItem.menu_image}`);
+        if (!mainImagePath) {
+          console.log(`❌ Main image not found: ${hotelData.image}`);
           skippedCount++;
           continue;
         }
 
-        console.log(`📤 Uploading image for: ${menuItem.menu_name}`);
-        
-        // Upload to Cloudinary
-        const uploadResult = await cloudinary.uploader.upload(imagePath, {
-          folder: "categories",
+        const mainImageResult = await cloudinary.uploader.upload(mainImagePath, {
+          folder: "hotels"
         });
 
-        // Update category with image URL
-        category.image = uploadResult.secure_url;
-        await category.save();
+        // Upload additional images
+        let additionalImages = [];
+        console.log(`📤 Uploading additional images for: ${hotelData.name}`);
+        
+        for (const imageName of hotelData.images) {
+          const additionalImagePath = findImageWithExtensions(imageName.replace('.png', ''));
+          
+          if (additionalImagePath) {
+            const result = await cloudinary.uploader.upload(additionalImagePath, {
+              folder: "hotels/rooms"
+            });
+            additionalImages.push(result.secure_url);
+            console.log(`   ✅ Uploaded: ${imageName}`);
+          } else {
+            console.log(`   ❌ Additional image not found: ${imageName}`);
+          }
+          
+          // Small delay to avoid overwhelming Cloudinary
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
 
-        console.log(`✅ Updated: ${menuItem.menu_name}`);
-        updatedCount++;
+        // Create new hotel
+        const newHotel = new Hotel({
+          name: hotelData.name,
+          description: hotelData.description,
+          address: hotelData.address,
+          county: hotelData.county,
+          pricePerNight: hotelData.pricePerNight,
+          amenities: hotelData.amenities,
+          image: mainImageResult.secure_url,
+          images: additionalImages,
+          contactEmail: hotelData.contactEmail,
+          contactPhone: hotelData.contactPhone,
+          roomsAvailable: hotelData.roomsAvailable,
+          isAvailable: hotelData.isAvailable
+        });
 
-        // Small delay to avoid overwhelming Cloudinary
+        await newHotel.save();
+        console.log(`✅ Added: ${hotelData.name}`);
+        addedCount++;
+
+        // Small delay between hotels
         await new Promise(resolve => setTimeout(resolve, 500));
 
       } catch (error) {
-        console.error(`❌ Error processing "${menuItem.menu_name}":`, error.message);
+        console.error(`❌ Error processing "${hotelData.name}":`, error.message);
       }
     }
 
-    console.log("\n📊 Update Summary:");
-    console.log(`✅ Updated: ${updatedCount} categories with images`);
-    console.log(`⏭️  Skipped: ${skippedCount} categories`);
-    console.log(`📝 Total processed: ${updatedCount + skippedCount}/${menu_list.length}`);
+    console.log("\n📊 Seeding Summary:");
+    console.log(`✅ Added: ${addedCount} hotels`);
+    console.log(`⏭️  Skipped: ${skippedCount} hotels (already exist or images missing)`);
+    console.log(`📝 Total processed: ${addedCount + skippedCount}/${hotels.length}`);
 
   } catch (error) {
-    console.error("❌ Error in update process:", error.message);
+    console.error("❌ Error in seeding process:", error.message);
   } finally {
     if (mongoose.connection.readyState !== 0) {
       await mongoose.disconnect();
@@ -555,4 +805,4 @@ const updateCategoryImages = async () => {
 };
 
 // Run the script
-updateCategoryImages();
+seedHotels();

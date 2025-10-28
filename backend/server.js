@@ -7,6 +7,7 @@ import connectDB from './configs/connectDB.js';
 import userRouter from './routes/userRouter.js';
 import dishRouter from './routes/dishRouter.js';
 import categoryRouter from './routes/categoryRouter.js';
+import hotelRouter from './routes/hotelRoute.js';
 
 // .......... express setup ..........
 const app = express();
@@ -39,6 +40,7 @@ app.get("/", (req, res) => {
 app.use("/api/user",userRouter)
 app.use("/api/dishes",dishRouter)
 app.use("/api/categories",categoryRouter)
+app.use('/api/hotels', hotelRouter);
 
 
 
