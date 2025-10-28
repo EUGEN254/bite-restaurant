@@ -11,6 +11,7 @@ export const RestaurantContextProvider = (props) => {
   const currSymbol = "KES";
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [categories, setCategories] = useState([]);
 
   // Fetch all dishes from database
   const fetchDishes = async () => {
@@ -27,6 +28,38 @@ export const RestaurantContextProvider = (props) => {
       toast.error("Failed to load dishes");
     }
   };
+
+  //fectching categories
+   const fetchCategories = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(`${backendUrl}/api/categories`, {
+          withCredentials: true,
+        });
+  
+        if (response.data.success) {
+          // Transform the data to match your frontend format
+          const formattedCategories = response.data.data.map((cat) => ({
+            id: cat._id,
+            name: cat.name,
+            description: cat.description || "",
+            status: cat.status || "active",
+            dishesCount: cat.dishesCount || 0,
+            image:cat.image,
+            createdAt: cat.createdAt || new Date().toISOString().split("T")[0],
+          }));
+  
+          setCategories(formattedCategories);
+          return formattedCategories;
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast.error("Failed to fetch categories");
+        return [];
+      } finally {
+        setLoading(false);
+      }
+    };
 
   // getting user data
   const fetchCurrentUser = async () => {
@@ -482,6 +515,7 @@ export const RestaurantContextProvider = (props) => {
   useEffect(() => {
     fetchCurrentUser();
     fetchDishes();
+    fetchCategories();
   }, []);
 
   // All values that will be available to components
@@ -495,6 +529,8 @@ export const RestaurantContextProvider = (props) => {
     //dishes
     fetchDishes,
     dishes,
+    categories,
+    fetchCategories,
 
     // Cart functionality
     cartItems,

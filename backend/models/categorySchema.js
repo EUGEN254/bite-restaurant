@@ -1,3 +1,4 @@
+// models/categorySchema.js
 import mongoose from "mongoose";
 
 const categorySchema = new mongoose.Schema(
@@ -14,7 +15,11 @@ const categorySchema = new mongoose.Schema(
     status: { 
       type: String, 
       default: "active",
-      enum: ["active", "inactive"] 
+      enum: ["active", "inactive"]
+    },
+    image: {
+      type: String, 
+      default: ""
     }
   },
   {

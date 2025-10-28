@@ -187,21 +187,21 @@ const getCategories = async (req, res) => {
       {
         $group: {
           _id: "$category",
-          count: { $sum: 1 }
-        }
-      }
+          count: { $sum: 1 },
+        },
+      },
     ]);
 
     // Convert dish counts to a lookup object
     const dishCountMap = {};
-    dishCounts.forEach(item => {
+    dishCounts.forEach((item) => {
       dishCountMap[item._id] = item.count;
     });
 
     // Add dish counts to categories
-    const categoriesWithCounts = categories.map(category => ({
+    const categoriesWithCounts = categories.map((category) => ({
       ...category.toObject(),
-      dishesCount: dishCountMap[category.name] || 0
+      dishesCount: dishCountMap[category.name] || 0,
     }));
 
     res.status(200).json({
@@ -249,10 +249,20 @@ const addCategory = async (req, res) => {
       });
     }
 
+    // Handle image upload if provided
+    let imageUrl = "";
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "categories",
+      });
+      imageUrl = result.secure_url;
+    }
+
     const category = await Category.create({
       name: name.trim(),
       description: description?.trim() || "",
       status: status || "active",
+      image: imageUrl,
     });
 
     res.status(201).json({
@@ -270,7 +280,6 @@ const addCategory = async (req, res) => {
   }
 };
 
-// Update category
 const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
@@ -310,6 +319,21 @@ const updateCategory = async (req, res) => {
 
     if (description !== undefined) category.description = description.trim();
     if (status) category.status = status;
+
+    // Handle image update if new file is provided
+    if (req.file) {
+      // Delete old image from Cloudinary if exists
+      if (category.image) {
+        const publicId = category.image.split("/").pop().split(".")[0];
+        await cloudinary.uploader.destroy(`categories/${publicId}`);
+      }
+
+      // Upload new image
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "categories",
+      });
+      category.image = result.secure_url;
+    }
 
     await category.save();
 

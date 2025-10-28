@@ -8,6 +8,8 @@ import {
   FaTag,
   FaCheckCircle,
   FaTimesCircle,
+  FaUpload,
+  FaImage,
 } from "react-icons/fa";
 import { useAdminContext } from "../context/AdminContext";
 import { toast } from "react-toastify";
@@ -35,6 +37,8 @@ const Category = () => {
     name: "",
     description: "",
     status: "active",
+    image: null,
+    imagePreview: null,
   });
 
   // Fetch categories on component mount
@@ -49,21 +53,77 @@ const Category = () => {
       category.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Image upload handlers for add modal
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setNewCategory(prev => ({
+        ...prev,
+        image: file,
+        imagePreview: URL.createObjectURL(file),
+      }));
+    }
+  };
+
+  const handleEditImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setEditCategory(prev => ({
+        ...prev,
+        image: file,
+        imagePreview: URL.createObjectURL(file),
+      }));
+    }
+  };
+
+  // Drag and drop handlers
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setNewCategory(prev => ({
+        ...prev,
+        image: file,
+        imagePreview: URL.createObjectURL(file),
+      }));
+    }
+  };
+
+  const handleEditDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setEditCategory(prev => ({
+        ...prev,
+        image: file,
+        imagePreview: URL.createObjectURL(file),
+      }));
+    }
+  };
+
   const handleEditCategory = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      const formData = new FormData();
+      formData.append("name", editCategory.name.trim());
+      formData.append("description", editCategory.description.trim());
+      formData.append("status", editCategory.status);
+      if (editCategory.image) {
+        formData.append("image", editCategory.image);
+      }
+
       const response = await axios.put(
         `${backendUrl}/api/categories/update-category/${selectedCategory.id}`,
-        {
-          name: editCategory.name.trim(),
-          description: editCategory.description.trim(),
-          status: editCategory.status,
-        },
+        formData,
         {
           withCredentials: true,
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "multipart/form-data" },
         }
       );
 
@@ -79,7 +139,8 @@ const Category = () => {
                 ...cat, 
                 name: editCategory.name,
                 description: editCategory.description,
-                status: editCategory.status
+                status: editCategory.status,
+                image: response.data.category.image
               } 
             : cat
         )
@@ -87,7 +148,13 @@ const Category = () => {
 
       setShowEditModal(false);
       setSelectedCategory(null);
-      setEditCategory({ name: "", description: "", status: "active" });
+      setEditCategory({ 
+        name: "", 
+        description: "", 
+        status: "active",
+        image: null,
+        imagePreview: null 
+      });
       toast.success(response.data.message || "Category updated successfully!");
     } catch (error) {
       console.error('Error updating category:', error);
@@ -136,6 +203,8 @@ const Category = () => {
       name: category.name,
       description: category.description,
       status: category.status,
+      image: null,
+      imagePreview: category.image || null,
     });
     setShowEditModal(true);
   };
@@ -284,7 +353,7 @@ const Category = () => {
         </div>
       </div>
 
-      {/* Categories Table */}
+      {/* Categories Table - Updated with Image Column */}
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
         {filteredCategories.length === 0 ? (
           <div className="text-center py-12">
@@ -303,6 +372,9 @@ const Category = () => {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Image
+                  </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Category
                   </th>
@@ -330,15 +402,21 @@ const Category = () => {
                     className="hover:bg-gray-50 transition-colors"
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold">
-                          <FaFolder className="h-5 w-5" />
+                      {category.image ? (
+                        <img
+                          src={category.image}
+                          alt={category.name}
+                          className="h-12 w-12 rounded-lg object-cover shadow-sm"
+                        />
+                      ) : (
+                        <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                          <FaFolder className="h-6 w-6" />
                         </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {category.name}
-                          </div>
-                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {category.name}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -389,10 +467,10 @@ const Category = () => {
         )}
       </div>
 
-      {/* Add Category Modal */}
+      {/* Add Category Modal - Updated with Image Upload */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-xl font-bold text-gray-800">
                 Add New Category
@@ -416,6 +494,7 @@ const Category = () => {
                       placeholder="e.g., Appetizers, Main Course"
                     />
                   </div>
+                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Description
@@ -433,6 +512,52 @@ const Category = () => {
                       placeholder="Brief description of this category..."
                     />
                   </div>
+
+                  {/* Image Upload Section */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <FaImage className="h-4 w-4 text-emerald-600" />
+                      Category Image
+                    </label>
+                    <div
+                      className="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-emerald-400 transition-all duration-200 cursor-pointer"
+                      onDragOver={handleDragOver}
+                      onDrop={handleDrop}
+                    >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        id="category-image"
+                      />
+                      <label htmlFor="category-image" className="cursor-pointer">
+                        {newCategory.imagePreview ? (
+                          <div className="flex flex-col items-center">
+                            <img
+                              src={newCategory.imagePreview}
+                              alt="Preview"
+                              className="h-32 w-32 object-cover rounded-xl mb-4 shadow-md"
+                            />
+                            <span className="text-emerald-600 font-medium">
+                              Change Image
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center">
+                            <FaUpload className="h-12 w-12 text-gray-400 mb-4" />
+                            <p className="text-gray-600 font-medium">
+                              Click or drag image here
+                            </p>
+                            <p className="text-gray-400 text-sm mt-1">
+                              PNG, JPG, JPEG up to 5MB
+                            </p>
+                          </div>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Status
@@ -478,10 +603,10 @@ const Category = () => {
         </div>
       )}
 
-      {/* Edit Category Modal */}
+      {/* Edit Category Modal - Updated with Image Upload */}
       {showEditModal && selectedCategory && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-xl font-bold text-gray-800">Edit Category</h2>
             </div>
@@ -521,6 +646,52 @@ const Category = () => {
                       className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 resize-none"
                     />
                   </div>
+
+                  {/* Image Upload Section for Edit */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <FaImage className="h-4 w-4 text-emerald-600" />
+                      Category Image
+                    </label>
+                    <div
+                      className="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-emerald-400 transition-all duration-200 cursor-pointer"
+                      onDragOver={handleDragOver}
+                      onDrop={handleEditDrop}
+                    >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleEditImageUpload}
+                        className="hidden"
+                        id="edit-category-image"
+                      />
+                      <label htmlFor="edit-category-image" className="cursor-pointer">
+                        {editCategory.imagePreview ? (
+                          <div className="flex flex-col items-center">
+                            <img
+                              src={editCategory.imagePreview}
+                              alt="Preview"
+                              className="h-32 w-32 object-cover rounded-xl mb-4 shadow-md"
+                            />
+                            <span className="text-emerald-600 font-medium">
+                              Change Image
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center">
+                            <FaUpload className="h-12 w-12 text-gray-400 mb-4" />
+                            <p className="text-gray-600 font-medium">
+                              Click or drag image here
+                            </p>
+                            <p className="text-gray-400 text-sm mt-1">
+                              PNG, JPG, JPEG up to 5MB
+                            </p>
+                          </div>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Status

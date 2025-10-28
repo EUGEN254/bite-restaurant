@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { food_list, menu_list } from "../assets/assets";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRestaurant } from "../context/RestaurantContext";
 
@@ -7,15 +6,32 @@ const Menu = () => {
   const navigate = useNavigate()
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortOption, setSortOption] = useState("default");
-  const [priceRange, setPriceRange] = useState(50); // Max price filter
-  const { addToCart } = useRestaurant();
+  const [priceRange, setPriceRange] = useState(50); 
+  const { addToCart, categories, fetchCategories, dishes } = useRestaurant();
+
+  
+
+  // Fetch categories when component mounts
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  // Use dynamic categories instead of static menu_list
+  const menu_list = categories
+    .filter(cat => cat.status === "active") 
+    .map(cat => ({
+      menu_name: cat.name,
+      menu_image: cat.image || "/default-category-image.png" 
+    }));
 
   // Filter food items based on selected category and price
-  const filteredFoodList = food_list.filter(food => {
+  const filteredFoodList = dishes.filter(food => {
     const categoryMatch = selectedCategory === "All" || food.category === selectedCategory;
     const priceMatch = food.price <= priceRange;
     return categoryMatch && priceMatch;
   });
+
+  console.log(filteredFoodList)
 
   // Sort the filtered list
   const sortedFoodList = [...filteredFoodList].sort((a, b) => {
@@ -34,18 +50,29 @@ const Menu = () => {
   });
 
   // Get unique categories for filter dropdown
-  const categories = ["All", ...new Set(food_list.map(food => food.category))];
+  const categoriesList = ["All", ...new Set(dishes.map(food => food.category))];
 
   // Get max price for range slider
-  const maxPrice = Math.max(...food_list.map(food => food.price));
+  const maxPrice = dishes.length > 0 ? Math.max(...dishes.map(food => food.price)) : 100;
 
-
-   // Updated Order Now handler
-   const handleOrderNow = (food) => {
-    addToCart(food); // Add to cart using context
-    navigate('/cart'); // Navigate to cart
+  // Updated Order Now handler
+  const handleOrderNow = (food) => {
+    addToCart(food); 
+    navigate('/cart'); 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // Loading state
+  if (categories.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#f8eee2] via-[#f7dece] to-white py-8 px-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading categories...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f8eee2] via-[#f7dece] to-white py-8 px-4">
@@ -81,6 +108,9 @@ const Menu = () => {
                     src={category.menu_image} 
                     alt={category.menu_name} 
                     className="w-full h-20 object-cover rounded-xl"
+                    onError={(e) => {
+                      e.target.src = "/default-category-image.png"; // Fallback if image fails to load
+                    }}
                   />
                 </div>
                 <p className="text-center text-sm font-medium text-gray-700 mt-2 group-hover:text-amber-600 transition-colors whitespace-nowrap">
@@ -108,6 +138,9 @@ const Menu = () => {
                   src={category.menu_image} 
                   alt={category.menu_name} 
                   className="w-full h-20 object-cover rounded-xl"
+                  onError={(e) => {
+                    e.target.src = "/default-category-image.png"; // Fallback if image fails to load
+                  }}
                 />
               </div>
               <p className="text-center text-sm font-medium text-gray-700 mt-2 group-hover:text-amber-600 transition-colors">
@@ -127,7 +160,7 @@ const Menu = () => {
               {selectedCategory === "All" ? "All Food Items" : `${selectedCategory} Items`}
             </h2>
             <p className="text-gray-600 mt-2">
-              Showing {sortedFoodList.length} of {food_list.length} items
+              Showing {sortedFoodList.length} of {dishes.length} items
             </p>
           </div>
           
@@ -145,7 +178,7 @@ const Menu = () => {
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200"
                 >
-                  {categories.map(category => (
+                  {categoriesList.map(category => (
                     <option key={category} value={category}>
                       {category}
                     </option>
