@@ -27,7 +27,7 @@ const popularDishesSchema = new mongoose.Schema(
     },
     isAvailable: {
       type: Boolean,
-      default: true // Changed from false to true
+      default: true 
     },
   },
   {

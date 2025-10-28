@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import PopularDishes from "../models/popularDishesSchema.js";
 import User from "../models/userSchema.js";
+import Category from "../models/categorySchema.js";
 
 // adding dish
 const addDish = async (req, res) => {
@@ -54,32 +55,32 @@ const addDish = async (req, res) => {
 const deleteDish = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     // Check if user exists and is authenticated
     const user = await User.findById(req.user._id);
     if (!user) {
-      return res.status(403).json({ 
-        success: false, 
-        message: "Not authorized" 
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized",
       });
     }
 
     const dish = await PopularDishes.findById(id);
     if (!dish) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Dish not found" 
+      return res.status(404).json({
+        success: false,
+        message: "Dish not found",
       });
     }
 
     // Delete image from Cloudinary
     if (dish.image) {
-      const publicId = dish.image.split('/').pop().split('.')[0];
+      const publicId = dish.image.split("/").pop().split(".")[0];
       await cloudinary.uploader.destroy(`dishes/${publicId}`);
     }
 
-    await PopularDishes.findByIdAndDelete(id); 
-    
+    await PopularDishes.findByIdAndDelete(id);
+
     res.status(200).json({
       success: true,
       message: "Dish deleted successfully",
@@ -87,30 +88,30 @@ const deleteDish = async (req, res) => {
     });
   } catch (err) {
     console.error("Delete dish error:", err);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: "Failed to delete dish",
-      error: err.message 
+      error: err.message,
     });
   }
 };
 
 const getAllDishes = async (req, res) => {
   try {
-    const dishes = await PopularDishes.find().sort({ createdAt: -1 }); 
-    
+    const dishes = await PopularDishes.find().sort({ createdAt: -1 });
+
     res.status(200).json({
       success: true,
       dishes,
       message: "Dishes fetched successfully",
-      count: dishes.length
+      count: dishes.length,
     });
   } catch (error) {
     console.error("Get all dishes error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch dishes",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -125,7 +126,7 @@ const updateDish = async (req, res) => {
     if (!user) {
       return res.status(403).json({
         success: false,
-        message: "Not authorized"
+        message: "Not authorized",
       });
     }
 
@@ -133,7 +134,7 @@ const updateDish = async (req, res) => {
     if (!dish) {
       return res.status(404).json({
         success: false,
-        message: "Dish not found"
+        message: "Dish not found",
       });
     }
 
@@ -148,7 +149,7 @@ const updateDish = async (req, res) => {
     if (req.file) {
       // Delete old image from Cloudinary
       if (dish.image) {
-        const publicId = dish.image.split('/').pop().split('.')[0];
+        const publicId = dish.image.split("/").pop().split(".")[0];
         await cloudinary.uploader.destroy(`dishes/${publicId}`);
       }
 
@@ -164,16 +165,211 @@ const updateDish = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Dish updated successfully",
-      dish: updatedDish
+      dish: updatedDish,
     });
   } catch (error) {
     console.error("Update dish error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to update dish",
-      error: error.message
+      error: error.message,
     });
   }
 };
 
-export { addDish, deleteDish, getAllDishes,  updateDish };
+const getCategories = async (req, res) => {
+  try {
+    // Get all categories
+    const categories = await Category.find({}).sort({ createdAt: -1 });
+
+    // Get dish counts by category
+    const dishCounts = await PopularDishes.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Convert dish counts to a lookup object
+    const dishCountMap = {};
+    dishCounts.forEach(item => {
+      dishCountMap[item._id] = item.count;
+    });
+
+    // Add dish counts to categories
+    const categoriesWithCounts = categories.map(category => ({
+      ...category.toObject(),
+      dishesCount: dishCountMap[category.name] || 0
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: categoriesWithCounts,
+    });
+  } catch (error) {
+    console.error("Fetch categories error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+// Add new category
+const addCategory = async (req, res) => {
+  try {
+    const { name, description, status } = req.body;
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Category name is required",
+      });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized",
+      });
+    }
+
+    const existingCategory = await Category.findOne({
+      name: name.trim(),
+    });
+
+    if (existingCategory) {
+      return res.status(400).json({
+        success: false,
+        message: "Category with this name already exists",
+      });
+    }
+
+    const category = await Category.create({
+      name: name.trim(),
+      description: description?.trim() || "",
+      status: status || "active",
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Category added successfully",
+      category: category,
+    });
+  } catch (error) {
+    console.error("Add category error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+// Update category
+const updateCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, status } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized",
+      });
+    }
+
+    const category = await Category.findById(id);
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    // If name is being updated, check for duplicates
+    if (name && name.trim() !== category.name) {
+      const existingCategory = await Category.findOne({
+        name: name.trim(),
+        _id: { $ne: id },
+      });
+
+      if (existingCategory) {
+        return res.status(400).json({
+          success: false,
+          message: "Category with this name already exists",
+        });
+      }
+      category.name = name.trim();
+    }
+
+    if (description !== undefined) category.description = description.trim();
+    if (status) category.status = status;
+
+    await category.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Category updated successfully",
+      category: category,
+    });
+  } catch (error) {
+    console.error("Update category error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+// Delete category
+const deleteCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized",
+      });
+    }
+
+    const category = await Category.findByIdAndDelete(id);
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Category deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete category error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+export {
+  addDish,
+  deleteDish,
+  getAllDishes,
+  updateDish,
+  addCategory,
+  getCategories,
+  deleteCategory,
+  updateCategory,
+};

@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 const Adddish = () => {
   const [editModal, setEditModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
-  const { currSymbol, backendUrl, addDish, dishes, removeDish, updateDish } =
+  const { currSymbol, categories,backendUrl, addDish, dishes, removeDish, updateDish } =
     useAdminContext();
   const [loading, setIsLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
@@ -44,15 +44,7 @@ const Adddish = () => {
     imagePreview: null,
   });
 
-  // Mock categories
-  const categories = [
-    { id: 1, name: "Appetizers" },
-    { id: 2, name: "Main Course" },
-    { id: 3, name: "Desserts" },
-    { id: 4, name: "Beverages" },
-    { id: 5, name: "Salads" },
-    { id: 6, name: "Specials" },
-  ];
+
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];

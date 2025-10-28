@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   FaFolder,
   FaPlus,
@@ -7,120 +7,127 @@ import {
   FaSearch,
   FaTag,
   FaCheckCircle,
-  FaTimesCircle
-} from 'react-icons/fa';
+  FaTimesCircle,
+} from "react-icons/fa";
+import { useAdminContext } from "../context/AdminContext";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const Category = () => {
-  const [categories, setCategories] = useState([
-    {
-      id: 1,
-      name: 'Appetizers',
-      description: 'Starters and small dishes',
-      status: 'active',
-      dishesCount: 8,
-      createdAt: '2024-01-15'
-    },
-    {
-      id: 2,
-      name: 'Main Course',
-      description: 'Main dishes and entrees',
-      status: 'active',
-      dishesCount: 15,
-      createdAt: '2024-01-10'
-    },
-    {
-      id: 3,
-      name: 'Desserts',
-      description: 'Sweet treats and desserts',
-      status: 'active',
-      dishesCount: 6,
-      createdAt: '2024-01-20'
-    },
-    {
-      id: 4,
-      name: 'Beverages',
-      description: 'Drinks and beverages',
-      status: 'inactive',
-      dishesCount: 12,
-      createdAt: '2024-02-01'
-    }
-  ]);
-
-  const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  const [newCategory, setNewCategory] = useState({
-    name: '',
-    description: '',
-    status: 'active'
-  });
+  const {
+    categories,
+    setCategories,
+    showAddModal,
+    setShowAddModal,
+    newCategory,
+    setNewCategory,
+    handleAddCategory,
+    backendUrl,
+    fetchCategories,
+  } = useAdminContext();
 
   const [editCategory, setEditCategory] = useState({
-    name: '',
-    description: '',
-    status: 'active'
+    name: "",
+    description: "",
+    status: "active",
   });
 
-  // Filter categories based on search
-  const filteredCategories = categories.filter(category =>
-    category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    category.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Fetch categories on component mount
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
-  const handleAddCategory = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      const newCat = {
-        id: categories.length + 1,
-        ...newCategory,
-        dishesCount: 0,
-        createdAt: new Date().toISOString().split('T')[0]
-      };
-      
-      setCategories([...categories, newCat]);
-      setShowAddModal(false);
-      setNewCategory({ name: '', description: '', status: 'active' });
-      setLoading(false);
-    }, 1000);
-  };
+  // Filter categories based on search
+  const filteredCategories = categories.filter(
+    (category) =>
+      category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      category.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleEditCategory = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setCategories(categories.map(cat =>
-        cat.id === selectedCategory.id
-          ? { ...cat, ...editCategory }
-          : cat
-      ));
-      
+
+    try {
+      const response = await axios.put(
+        `${backendUrl}/api/categories/update-category/${selectedCategory.id}`,
+        {
+          name: editCategory.name.trim(),
+          description: editCategory.description.trim(),
+          status: editCategory.status,
+        },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Failed to update category");
+      }
+
+      // Update local state
+      setCategories(
+        categories.map((cat) =>
+          cat.id === selectedCategory.id 
+            ? { 
+                ...cat, 
+                name: editCategory.name,
+                description: editCategory.description,
+                status: editCategory.status
+              } 
+            : cat
+        )
+      );
+
       setShowEditModal(false);
       setSelectedCategory(null);
-      setEditCategory({ name: '', description: '', status: 'active' });
+      setEditCategory({ name: "", description: "", status: "active" });
+      toast.success(response.data.message || "Category updated successfully!");
+    } catch (error) {
+      console.error('Error updating category:', error);
+      toast.error(
+        error.response?.data?.message || error.message || "Failed to update category"
+      );
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const handleDeleteCategory = async () => {
     if (!selectedCategory) return;
     setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setCategories(categories.filter(cat => cat.id !== selectedCategory.id));
+
+    try {
+      const response = await axios.delete(
+        `${backendUrl}/api/categories/delete-category/${selectedCategory.id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Failed to delete category");
+      }
+
+      // Remove from local state
+      setCategories(categories.filter((cat) => cat.id !== selectedCategory.id));
       setShowDeleteModal(false);
       setSelectedCategory(null);
+      toast.success(response.data.message || "Category deleted successfully!");
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      toast.error(
+        error.response?.data?.message || error.message || "Failed to delete category"
+      );
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const openEditModal = (category) => {
@@ -128,7 +135,7 @@ const Category = () => {
     setEditCategory({
       name: category.name,
       description: category.description,
-      status: category.status
+      status: category.status,
     });
     setShowEditModal(true);
   };
@@ -138,20 +145,51 @@ const Category = () => {
     setShowDeleteModal(true);
   };
 
-  const toggleStatus = (categoryId) => {
-    setCategories(categories.map(cat =>
-      cat.id === categoryId
-        ? { ...cat, status: cat.status === 'active' ? 'inactive' : 'active' }
-        : cat
-    ));
+  const toggleStatus = async (categoryId) => {
+    try {
+      const category = categories.find(cat => cat.id === categoryId);
+      const newStatus = category.status === "active" ? "inactive" : "active";
+      
+      const response = await axios.put(
+        `${backendUrl}/api/categories/update-category/${categoryId}`,
+        {
+          status: newStatus,
+        },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (response.data.success) {
+        // Update local state
+        setCategories(
+          categories.map((cat) =>
+            cat.id === categoryId
+              ? { ...cat, status: newStatus }
+              : cat
+          )
+        );
+        toast.success("Category status updated!");
+      }
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error("Failed to update category status");
+    }
   };
 
   const getStatusColor = (status) => {
-    return status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+    return status === "active"
+      ? "bg-green-100 text-green-800"
+      : "bg-red-100 text-red-800";
   };
 
   const getStatusIcon = (status) => {
-    return status === 'active' ? <FaCheckCircle className="h-3 w-3" /> : <FaTimesCircle className="h-3 w-3" />;
+    return status === "active" ? (
+      <FaCheckCircle className="h-3 w-3" />
+    ) : (
+      <FaTimesCircle className="h-3 w-3" />
+    );
   };
 
   return (
@@ -159,12 +197,17 @@ const Category = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Category Management</h1>
-          <p className="text-gray-600 mt-2">Organize your menu with categories</p>
+          <h1 className="text-3xl font-bold text-gray-800">
+            Category Management
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Organize your menu with categories
+          </p>
         </div>
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
           <p className="text-emerald-700 font-medium">
-            Total Categories: <span className="text-emerald-800">{categories.length}</span>
+            Total Categories:{" "}
+            <span className="text-emerald-800">{categories.length}</span>
           </p>
         </div>
       </div>
@@ -174,9 +217,11 @@ const Category = () => {
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Active Categories</p>
+              <p className="text-sm font-medium text-gray-600">
+                Active Categories
+              </p>
               <p className="text-2xl font-bold text-gray-800 mt-1">
-                {categories.filter(cat => cat.status === 'active').length}
+                {categories.filter((cat) => cat.status === "active").length}
               </p>
             </div>
             <div className="p-3 bg-green-100 rounded-xl">
@@ -202,9 +247,11 @@ const Category = () => {
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Inactive Categories</p>
+              <p className="text-sm font-medium text-gray-600">
+                Inactive Categories
+              </p>
               <p className="text-2xl font-bold text-gray-800 mt-1">
-                {categories.filter(cat => cat.status === 'inactive').length}
+                {categories.filter((cat) => cat.status === "inactive").length}
               </p>
             </div>
             <div className="p-3 bg-red-100 rounded-xl">
@@ -246,7 +293,9 @@ const Category = () => {
               No categories found
             </h3>
             <p className="text-gray-400">
-              {searchTerm ? 'Try adjusting your search terms' : 'Start by adding your first category'}
+              {searchTerm
+                ? "Try adjusting your search terms"
+                : "Start by adding your first category"}
             </p>
           </div>
         ) : (
@@ -276,14 +325,19 @@ const Category = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredCategories.map((category) => (
-                  <tr key={category.id} className="hover:bg-gray-50 transition-colors">
+                  <tr
+                    key={category.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold">
                           <FaFolder className="h-5 w-5" />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{category.name}</div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {category.name}
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -303,10 +357,12 @@ const Category = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button
                         onClick={() => toggleStatus(category.id)}
-                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors ${getStatusColor(category.status)} hover:opacity-80`}
+                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors ${getStatusColor(
+                          category.status
+                        )} hover:opacity-80`}
                       >
                         {getStatusIcon(category.status)}
-                        {category.status === 'active' ? 'Active' : 'Inactive'}
+                        {category.status === "active" ? "Active" : "Inactive"}
                       </button>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -338,7 +394,9 @@ const Category = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-md">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-800">Add New Category</h2>
+              <h2 className="text-xl font-bold text-gray-800">
+                Add New Category
+              </h2>
             </div>
             <div className="p-6">
               <form onSubmit={handleAddCategory}>
@@ -351,7 +409,9 @@ const Category = () => {
                       type="text"
                       required
                       value={newCategory.name}
-                      onChange={(e) => setNewCategory({...newCategory, name: e.target.value})}
+                      onChange={(e) =>
+                        setNewCategory({ ...newCategory, name: e.target.value })
+                      }
                       className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                       placeholder="e.g., Appetizers, Main Course"
                     />
@@ -362,7 +422,12 @@ const Category = () => {
                     </label>
                     <textarea
                       value={newCategory.description}
-                      onChange={(e) => setNewCategory({...newCategory, description: e.target.value})}
+                      onChange={(e) =>
+                        setNewCategory({
+                          ...newCategory,
+                          description: e.target.value,
+                        })
+                      }
                       rows="3"
                       className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 resize-none"
                       placeholder="Brief description of this category..."
@@ -374,7 +439,12 @@ const Category = () => {
                     </label>
                     <select
                       value={newCategory.status}
-                      onChange={(e) => setNewCategory({...newCategory, status: e.target.value})}
+                      onChange={(e) =>
+                        setNewCategory({
+                          ...newCategory,
+                          status: e.target.value,
+                        })
+                      }
                       className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white"
                     >
                       <option value="active">Active</option>
@@ -395,11 +465,11 @@ const Category = () => {
                     disabled={loading}
                     className={`px-6 py-2 rounded-xl transition-colors ${
                       loading
-                        ? 'bg-emerald-400 cursor-not-allowed text-white'
-                        : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                        ? "bg-emerald-400 cursor-not-allowed text-white"
+                        : "bg-emerald-600 hover:bg-emerald-700 text-white"
                     }`}
                   >
-                    {loading ? 'Adding...' : 'Add Category'}
+                    {loading ? "Adding..." : "Add Category"}
                   </button>
                 </div>
               </form>
@@ -426,7 +496,12 @@ const Category = () => {
                       type="text"
                       required
                       value={editCategory.name}
-                      onChange={(e) => setEditCategory({...editCategory, name: e.target.value})}
+                      onChange={(e) =>
+                        setEditCategory({
+                          ...editCategory,
+                          name: e.target.value,
+                        })
+                      }
                       className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                     />
                   </div>
@@ -436,7 +511,12 @@ const Category = () => {
                     </label>
                     <textarea
                       value={editCategory.description}
-                      onChange={(e) => setEditCategory({...editCategory, description: e.target.value})}
+                      onChange={(e) =>
+                        setEditCategory({
+                          ...editCategory,
+                          description: e.target.value,
+                        })
+                      }
                       rows="3"
                       className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 resize-none"
                     />
@@ -447,7 +527,12 @@ const Category = () => {
                     </label>
                     <select
                       value={editCategory.status}
-                      onChange={(e) => setEditCategory({...editCategory, status: e.target.value})}
+                      onChange={(e) =>
+                        setEditCategory({
+                          ...editCategory,
+                          status: e.target.value,
+                        })
+                      }
                       className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white"
                     >
                       <option value="active">Active</option>
@@ -468,11 +553,11 @@ const Category = () => {
                     disabled={loading}
                     className={`px-6 py-2 rounded-xl transition-colors ${
                       loading
-                        ? 'bg-emerald-400 cursor-not-allowed text-white'
-                        : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                        ? "bg-emerald-400 cursor-not-allowed text-white"
+                        : "bg-emerald-600 hover:bg-emerald-700 text-white"
                     }`}
                   >
-                    {loading ? 'Updating...' : 'Update Category'}
+                    {loading ? "Updating..." : "Update Category"}
                   </button>
                 </div>
               </form>
@@ -488,14 +573,17 @@ const Category = () => {
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <FaTrash className="h-8 w-8 text-red-600" />
             </div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">Delete Category</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">
+              Delete Category
+            </h3>
             <p className="text-gray-600 mb-4">
-              Are you sure you want to delete <strong>"{selectedCategory.name}"</strong>? 
-              This action cannot be undone.
+              Are you sure you want to delete{" "}
+              <strong>"{selectedCategory.name}"</strong>? This action cannot be
+              undone.
             </p>
             {selectedCategory.dishesCount > 0 && (
               <p className="text-yellow-600 text-sm mb-4">
-                ⚠️ This category contains {selectedCategory.dishesCount} dishes. 
+                ⚠️ This category contains {selectedCategory.dishesCount} dishes.
                 Deleting it may affect your menu organization.
               </p>
             )}
@@ -512,11 +600,11 @@ const Category = () => {
                 disabled={loading}
                 className={`px-6 py-2 rounded-xl transition-colors ${
                   loading
-                    ? 'bg-red-400 cursor-not-allowed text-white'
-                    : 'bg-red-600 hover:bg-red-700 text-white'
+                    ? "bg-red-400 cursor-not-allowed text-white"
+                    : "bg-red-600 hover:bg-red-700 text-white"
                 }`}
               >
-                {loading ? 'Deleting...' : 'Delete'}
+                {loading ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>
