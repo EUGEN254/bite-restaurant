@@ -1,53 +1,52 @@
 @import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap");
 @import "tailwindcss";
 
-
-
 /* Add this to your main CSS file */
 html, body {
   font-family: "Fredoka", cursive;
-    overflow-x: hidden;
-    max-width: 100vw;
-  }
-  
-  #root {
-    overflow-x: hidden;
-    max-width: 100vw;
-  }
+  overflow-x: hidden;
+  max-width: 100vw;
+}
 
-/* Custom Scrollbar */
+#root {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Custom Scrollbar - Thin Version Without Arrows */
 ::-webkit-scrollbar {
-  width: 6px; /* Small width */
-  height: 6px; /* For horizontal scrollbars */
+  width: 4px; /* Even smaller width */
+  height: 4px; /* For horizontal scrollbars */
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-light);
+  background: #f1f5f9; /* Light gray background */
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(
-    to bottom,
-    var(--color-primary),
-    var(--color-secondary)
-  );
+  background: #10b981; /* Emerald color */
   border-radius: 10px;
-  border: 2px solid var(--color-light);
+  border: 1px solid #f1f5f9; /* Thin border */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(
-    to bottom,
-    var(--color-secondary),
-    var(--color-dark)
-  );
+  background: #059669; /* Darker emerald on hover */
 }
 
-/* For Firefox */
+/* Hide scrollbar buttons/arrows */
+::-webkit-scrollbar-button {
+  display: none; /* Hide the up/down buttons */
+}
+
+::-webkit-scrollbar-corner {
+  display: none; /* Hide the corner where vertical and horizontal meet */
+}
+
+/* For Firefox - hides arrows automatically with 'thin' */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-primary) var(--color-light);
+  scrollbar-color: #10b981 #f1f5f9;
 }
 
 /* Hide horizontal scrollbar but keep functionality */
@@ -63,3 +62,91 @@ html, body {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+/* Sidebar Specific Scrollbar - Even Thinner Without Arrows */
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 3px; /* Ultra thin for sidebar */
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: #064e3b; /* Dark emerald for sidebar track */
+  border-radius: 10px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background: #10b981; /* Emerald color */
+  border-radius: 10px;
+  border: 1px solid #064e3b; /* Thin border matching track */
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #34d399; /* Lighter emerald on hover */
+}
+
+/* Hide sidebar scrollbar buttons */
+.sidebar-scrollbar::-webkit-scrollbar-button {
+  display: none;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-corner {
+  display: none;
+}
+
+/* For Firefox sidebar */
+.sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #10b981 #064e3b;
+}
+
+/* Ultra Thin Scrollbar Variant Without Arrows */
+.scrollbar-ultra-thin::-webkit-scrollbar {
+  width: 2px; /* Ultra thin */
+}
+
+.scrollbar-ultra-thin::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+.scrollbar-ultra-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.scrollbar-ultra-thin::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.scrollbar-ultra-thin::-webkit-scrollbar-button {
+  display: none;
+}
+
+.scrollbar-ultra-thin::-webkit-scrollbar-corner {
+  display: none;
+}
+
+/* Completely minimal scrollbar - just the thumb */
+.scrollbar-minimal::-webkit-scrollbar {
+  width: 3px;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 10px;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-thumb:hover {
+  background: #059669;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-button {
+  display: none;
+}
+
+.scrollbar-minimal::-webkit-scrollbar-corner {
+  display: none;
+}
+

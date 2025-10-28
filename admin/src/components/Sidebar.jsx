@@ -11,7 +11,8 @@ import {
   FaChevronRight,
   FaShoppingCart,
   FaCalendarAlt,
-  FaBox
+  FaBox,
+  FaMoneyBillWave
 } from "react-icons/fa";
 import { useAdminContext } from "../context/AdminContext";
 
@@ -30,7 +31,7 @@ const Sidebar = ({ onLinkClick }) => {
       icon: <FaUtensils className="text-lg" /> 
     },
     { 
-      name: "category", 
+      name: "Category", 
       path: "category", 
       icon: <FaList className="text-lg" /> 
     },
@@ -45,7 +46,7 @@ const Sidebar = ({ onLinkClick }) => {
       icon: <FaCalendarAlt className="text-lg" /> 
     },
     { 
-      name: "Staff/customers", 
+      name: "Staff/Customers", 
       path: "staff-customers", 
       icon: <FaUsers className="text-lg" /> 
     },
@@ -58,6 +59,11 @@ const Sidebar = ({ onLinkClick }) => {
       name: "Analytics", 
       path: "analytics", 
       icon: <FaChartBar className="text-lg" /> 
+    },
+    { 
+      name: "Payment", 
+      path: "payment", 
+      icon: <FaMoneyBillWave className="text-lg" /> 
     },
     { 
       name: "Settings", 
@@ -98,40 +104,42 @@ const Sidebar = ({ onLinkClick }) => {
         </button>
       </div>
 
-      {/* Navigation Links */}
-      <nav className="flex-1 p-4">
-        <ul className="space-y-2">
-          {navLinks.map((link, index) => (
-            <li key={index}>
-              <NavLink
-                to={link.path}
-                onClick={onLinkClick}
-                end={link.path === "dashboard"}
-                className={({ isActive }) => 
-                  `flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group ${
-                    isActive 
-                      ? 'bg-white text-emerald-700 shadow-lg' 
-                      : 'text-emerald-100 hover:bg-emerald-800 hover:text-white'
-                  } ${isCollapsed ? 'justify-center' : ''}`
-                }
-              >
-                <div className="flex-shrink-0">
-                  {link.icon}
-                </div>
-                {!isCollapsed && (
-                  <span className="font-medium whitespace-nowrap transition-opacity duration-200">
-                    {link.name}
-                  </span>
-                )}
-                {isCollapsed && (
-                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50 pointer-events-none">
-                    {link.name}
+      {/* Navigation Links - Horizontal Scrollable */}
+      <nav className="flex-1 p-2 overflow-hidden">
+        <div className="h-full overflow-y-auto sidebar-scrollbar hide-horizontal-scrollbar">
+          <ul className="space-y-2">
+            {navLinks.map((link, index) => (
+              <li key={index}>
+                <NavLink
+                  to={link.path}
+                  onClick={onLinkClick}
+                  end={link.path === "dashboard"}
+                  className={({ isActive }) => 
+                    `flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group ${
+                      isActive 
+                        ? 'bg-white text-emerald-700 shadow-lg' 
+                        : 'text-emerald-100 hover:bg-emerald-800 hover:text-white'
+                    } ${isCollapsed ? 'justify-center' : ''}`
+                  }
+                >
+                  <div className="flex-shrink-0">
+                    {link.icon}
                   </div>
-                )}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
+                  {!isCollapsed && (
+                    <span className="font-medium whitespace-nowrap transition-opacity duration-200">
+                      {link.name}
+                    </span>
+                  )}
+                  {isCollapsed && (
+                    <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50 pointer-events-none">
+                      {link.name}
+                    </div>
+                  )}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </div>
       </nav>
 
       {/* Footer */}
