@@ -31,7 +31,7 @@ const Menu = () => {
     return categoryMatch && priceMatch;
   });
 
-  console.log(filteredFoodList)
+  
 
   // Sort the filtered list
   const sortedFoodList = [...filteredFoodList].sort((a, b) => {

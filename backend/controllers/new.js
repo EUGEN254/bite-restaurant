@@ -430,11 +430,6 @@ import { fileURLToPath } from "url";
 dotenv.config();
 
 // Configure Cloudinary with hardcoded values
-cloudinary.config({
-  cloud_name: "dmxvsiwev",
-  api_key: "414399732439977",
-  api_secret: "Wc22ADTWYrw2NkSiU3-48MDrrvI",
-});
 
 console.log("✅ Cloudinary configured");
 
@@ -481,7 +476,7 @@ const menu_list = [
 const updateCategoryImages = async () => {
   try {
     // Connect to MongoDB
-    await mongoose.connect(`mongodb+srv://eugenshitera:12345@cluster0.nqlxtyd.mongodb.net/bite-restaurant`, {
+    await mongoose.connect(``, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
