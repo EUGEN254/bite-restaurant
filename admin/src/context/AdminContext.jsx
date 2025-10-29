@@ -11,12 +11,15 @@ export const AdminContextProvider = (props) => {
   const [admin, setAdmin] = useState(null);
   const [categories, setCategories] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+
+ 
   const [newCategory, setNewCategory] = useState({
     name: "",
     description: "",
     status: "active",
   });
   const [loading, setLoading] = useState(false);
+
 
   // Fetch categories function
   const fetchCategories = async () => {
@@ -34,7 +37,7 @@ export const AdminContextProvider = (props) => {
           description: cat.description || "",
           status: cat.status || "active",
           dishesCount: cat.dishesCount || 0,
-          image:cat.image,
+          image: cat.image,
           createdAt: cat.createdAt || new Date().toISOString().split("T")[0],
         }));
 

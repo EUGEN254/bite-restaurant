@@ -575,7 +575,6 @@ export const hotel = [
   },
 ];
 
-
 // Table data
 export const tables = [
   {

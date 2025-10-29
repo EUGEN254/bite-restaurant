@@ -8,6 +8,7 @@ import userRouter from './routes/userRouter.js';
 import dishRouter from './routes/dishRouter.js';
 import categoryRouter from './routes/categoryRouter.js';
 import hotelRouter from './routes/hotelRoute.js';
+import tableRouter from './routes/tableRoute.js';
 
 // .......... express setup ..........
 const app = express();
@@ -41,6 +42,8 @@ app.use("/api/user",userRouter)
 app.use("/api/dishes",dishRouter)
 app.use("/api/categories",categoryRouter)
 app.use('/api/hotels', hotelRouter);
+app.use('/api/tables', tableRouter);
+
 
 
 

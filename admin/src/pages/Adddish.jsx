@@ -18,8 +18,15 @@ import { toast } from "react-toastify";
 const Adddish = () => {
   const [editModal, setEditModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
-  const { currSymbol, categories,backendUrl, addDish, dishes, removeDish, updateDish } =
-    useAdminContext();
+  const {
+    currSymbol,
+    categories,
+    backendUrl,
+    addDish,
+    dishes,
+    removeDish,
+    updateDish,
+  } = useAdminContext();
   const [loading, setIsLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -43,8 +50,6 @@ const Adddish = () => {
     image: null,
     imagePreview: null,
   });
-
-
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -146,7 +151,7 @@ const Adddish = () => {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!editForm.dishname?.trim() || !editForm.amount) {
       return toast.error("Dish name and amount are required");
     }
@@ -159,7 +164,10 @@ const Adddish = () => {
     formData.append("category", editForm.category);
     formData.append("dishname", editForm.dishname.trim());
     formData.append("amount", parseFloat(editForm.amount));
-    formData.append("description", editForm.description || "No description provided");
+    formData.append(
+      "description",
+      editForm.description || "No description provided"
+    );
     formData.append("status", editForm.status);
     if (editForm.image) {
       formData.append("image", editForm.image);
@@ -187,7 +195,9 @@ const Adddish = () => {
     } catch (error) {
       console.error("Update dish error:", error);
       toast.error(
-        error.response?.data?.message || error.message || "Failed to update dish"
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to update dish"
       );
     } finally {
       setEditLoading(false);
@@ -258,12 +268,12 @@ const Adddish = () => {
     setDeleteLoading(true);
     try {
       const response = await axios.delete(
-        `${backendUrl}/api/dishes/delete-dish/${deleteModal.dishId}`, 
+        `${backendUrl}/api/dishes/delete-dish/${deleteModal.dishId}`,
         {
           withCredentials: true,
         }
       );
-      
+
       if (!response.data.success) {
         throw new Error(response.data.message || "Failed to delete dish");
       }
@@ -272,7 +282,11 @@ const Adddish = () => {
       toast.success(response.data.message);
     } catch (error) {
       console.error("Delete error:", error);
-      toast.error(error.response?.data?.message || error.message || "Failed to delete dish");
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to delete dish"
+      );
     } finally {
       setDeleteLoading(false);
       closeDeleteModal();
@@ -608,7 +622,10 @@ const Adddish = () => {
               <h2 className="text-xl font-bold text-gray-800">Edit Dish</h2>
             </div>
             <div className="p-6">
-              <form onSubmit={handleEditSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <form
+                onSubmit={handleEditSubmit}
+                className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+              >
                 {/* Category */}
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 text-sm font-medium text-gray-700">

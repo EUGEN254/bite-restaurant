@@ -13,7 +13,7 @@ import {
   FaCheckCircle,
   FaTimesCircle,
   FaUpload,
-  FaImage
+  FaImage,
 } from "react-icons/fa";
 import { useAdminContext } from "../context/AdminContext";
 import { toast } from "react-toastify";
@@ -30,18 +30,55 @@ const HotelManagement = () => {
   const { backendUrl } = useAdminContext();
 
   // Kenyan counties for dropdown
-const counties = [
-  "Baringo", "Bomet", "Bungoma", "Busia", "Elgeyo-Marakwet", 
-  "Embu", "Garissa", "Homa Bay", "Isiolo", "Kajiado", 
-  "Kakamega", "Kericho", "Kiambu", "Kilifi", "Kirinyaga", 
-  "Kisii", "Kisumu", "Kitui", "Kwale", "Laikipia", 
-  "Lamu", "Machakos", "Makueni", "Mandera", "Marsabit", 
-  "Meru", "Migori", "Mombasa", "Murang'a", "Nairobi", 
-  "Nakuru", "Nandi", "Narok", "Nyamira", "Nyandarua", 
-  "Nyeri", "Samburu", "Siaya", "Taita-Taveta", "Tana River", 
-  "Tharaka-Nithi", "Trans Nzoia", "Turkana", "Uasin Gishu", 
-  "Vihiga", "Wajir", "West Pokot"
-];
+  const counties = [
+    "Baringo",
+    "Bomet",
+    "Bungoma",
+    "Busia",
+    "Elgeyo-Marakwet",
+    "Embu",
+    "Garissa",
+    "Homa Bay",
+    "Isiolo",
+    "Kajiado",
+    "Kakamega",
+    "Kericho",
+    "Kiambu",
+    "Kilifi",
+    "Kirinyaga",
+    "Kisii",
+    "Kisumu",
+    "Kitui",
+    "Kwale",
+    "Laikipia",
+    "Lamu",
+    "Machakos",
+    "Makueni",
+    "Mandera",
+    "Marsabit",
+    "Meru",
+    "Migori",
+    "Mombasa",
+    "Murang'a",
+    "Nairobi",
+    "Nakuru",
+    "Nandi",
+    "Narok",
+    "Nyamira",
+    "Nyandarua",
+    "Nyeri",
+    "Samburu",
+    "Siaya",
+    "Taita-Taveta",
+    "Tana River",
+    "Tharaka-Nithi",
+    "Trans Nzoia",
+    "Turkana",
+    "Uasin Gishu",
+    "Vihiga",
+    "Wajir",
+    "West Pokot",
+  ];
 
   const [newHotel, setNewHotel] = useState({
     name: "",
@@ -57,7 +94,7 @@ const counties = [
     image: null,
     imagePreview: null,
     images: [],
-    imagesPreview: []
+    imagesPreview: [],
   });
 
   const [editHotel, setEditHotel] = useState({
@@ -74,7 +111,7 @@ const counties = [
     image: null,
     imagePreview: null,
     images: [],
-    imagesPreview: []
+    imagesPreview: [],
   });
 
   // Fetch hotels
@@ -101,17 +138,18 @@ const counties = [
   }, []);
 
   // Filter hotels based on search
-  const filteredHotels = hotels.filter(hotel =>
-    hotel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    hotel.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    hotel.county.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredHotels = hotels.filter(
+    (hotel) =>
+      hotel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      hotel.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      hotel.county.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Image upload handlers
   const handleMainImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setNewHotel(prev => ({
+      setNewHotel((prev) => ({
         ...prev,
         image: file,
         imagePreview: URL.createObjectURL(file),
@@ -123,9 +161,12 @@ const counties = [
     const files = Array.from(event.target.files);
     if (files.length > 0) {
       const newImages = [...newHotel.images, ...files];
-      const newPreviews = [...newHotel.imagesPreview, ...files.map(file => URL.createObjectURL(file))];
-      
-      setNewHotel(prev => ({
+      const newPreviews = [
+        ...newHotel.imagesPreview,
+        ...files.map((file) => URL.createObjectURL(file)),
+      ];
+
+      setNewHotel((prev) => ({
         ...prev,
         images: newImages,
         imagesPreview: newPreviews,
@@ -136,7 +177,7 @@ const counties = [
   const handleEditMainImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setEditHotel(prev => ({
+      setEditHotel((prev) => ({
         ...prev,
         image: file,
         imagePreview: URL.createObjectURL(file),
@@ -148,9 +189,12 @@ const counties = [
     const files = Array.from(event.target.files);
     if (files.length > 0) {
       const newImages = [...editHotel.images, ...files];
-      const newPreviews = [...editHotel.imagesPreview, ...files.map(file => URL.createObjectURL(file))];
-      
-      setEditHotel(prev => ({
+      const newPreviews = [
+        ...editHotel.imagesPreview,
+        ...files.map((file) => URL.createObjectURL(file)),
+      ];
+
+      setEditHotel((prev) => ({
         ...prev,
         images: newImages,
         imagesPreview: newPreviews,
@@ -160,7 +204,7 @@ const counties = [
 
   // Remove additional image
   const removeAdditionalImage = (index) => {
-    setNewHotel(prev => ({
+    setNewHotel((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
       imagesPreview: prev.imagesPreview.filter((_, i) => i !== index),
@@ -168,7 +212,7 @@ const counties = [
   };
 
   const removeEditAdditionalImage = (index) => {
-    setEditHotel(prev => ({
+    setEditHotel((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
       imagesPreview: prev.imagesPreview.filter((_, i) => i !== index),
@@ -183,23 +227,26 @@ const counties = [
   const handleDrop = (e, type) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
-    
-    if (type === 'main') {
+
+    if (type === "main") {
       const file = files[0];
       if (file && file.type.startsWith("image/")) {
-        setNewHotel(prev => ({
+        setNewHotel((prev) => ({
           ...prev,
           image: file,
           imagePreview: URL.createObjectURL(file),
         }));
       }
-    } else if (type === 'additional') {
-      const imageFiles = files.filter(file => file.type.startsWith("image/"));
+    } else if (type === "additional") {
+      const imageFiles = files.filter((file) => file.type.startsWith("image/"));
       if (imageFiles.length > 0) {
         const newImages = [...newHotel.images, ...imageFiles];
-        const newPreviews = [...newHotel.imagesPreview, ...imageFiles.map(file => URL.createObjectURL(file))];
-        
-        setNewHotel(prev => ({
+        const newPreviews = [
+          ...newHotel.imagesPreview,
+          ...imageFiles.map((file) => URL.createObjectURL(file)),
+        ];
+
+        setNewHotel((prev) => ({
           ...prev,
           images: newImages,
           imagesPreview: newPreviews,
@@ -215,7 +262,12 @@ const counties = [
 
     try {
       // Validation
-      if (!newHotel.name?.trim() || !newHotel.address || !newHotel.county || !newHotel.pricePerNight) {
+      if (
+        !newHotel.name?.trim() ||
+        !newHotel.address ||
+        !newHotel.county ||
+        !newHotel.pricePerNight
+      ) {
         return toast.error("Name, address, county, and price are required");
       }
 
@@ -234,9 +286,9 @@ const counties = [
       formData.append("contactPhone", newHotel.contactPhone);
       formData.append("roomsAvailable", newHotel.roomsAvailable);
       formData.append("isAvailable", newHotel.isAvailable);
-      
+
       formData.append("image", newHotel.image);
-      
+
       // Append additional images
       newHotel.images.forEach((image, index) => {
         formData.append("images", image);
@@ -256,7 +308,7 @@ const counties = [
       }
 
       // Add to local state
-      setHotels(prev => [response.data.hotel, ...prev]);
+      setHotels((prev) => [response.data.hotel, ...prev]);
       setShowAddModal(false);
       setNewHotel({
         name: "",
@@ -272,13 +324,12 @@ const counties = [
         image: null,
         imagePreview: null,
         images: [],
-        imagesPreview: []
+        imagesPreview: [],
       });
-      
-      toast.success(response.data.message || "Hotel added successfully!");
 
+      toast.success(response.data.message || "Hotel added successfully!");
     } catch (error) {
-      console.error('Error adding hotel:', error);
+      console.error("Error adding hotel:", error);
       toast.error(
         error.response?.data?.message || error.message || "Failed to add hotel"
       );
@@ -304,11 +355,11 @@ const counties = [
       formData.append("contactPhone", editHotel.contactPhone);
       formData.append("roomsAvailable", editHotel.roomsAvailable);
       formData.append("isAvailable", editHotel.isAvailable);
-      
+
       if (editHotel.image) {
         formData.append("image", editHotel.image);
       }
-      
+
       // Append additional images
       editHotel.images.forEach((image, index) => {
         formData.append("images", image);
@@ -328,9 +379,11 @@ const counties = [
       }
 
       // Update local state
-      setHotels(prev => prev.map(hotel => 
-        hotel._id === selectedHotel._id ? response.data.hotel : hotel
-      ));
+      setHotels((prev) =>
+        prev.map((hotel) =>
+          hotel._id === selectedHotel._id ? response.data.hotel : hotel
+        )
+      );
 
       setShowEditModal(false);
       setSelectedHotel(null);
@@ -348,15 +401,16 @@ const counties = [
         image: null,
         imagePreview: null,
         images: [],
-        imagesPreview: []
+        imagesPreview: [],
       });
-      
-      toast.success(response.data.message || "Hotel updated successfully!");
 
+      toast.success(response.data.message || "Hotel updated successfully!");
     } catch (error) {
-      console.error('Error updating hotel:', error);
+      console.error("Error updating hotel:", error);
       toast.error(
-        error.response?.data?.message || error.message || "Failed to update hotel"
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to update hotel"
       );
     } finally {
       setLoading(false);
@@ -381,16 +435,19 @@ const counties = [
       }
 
       // Remove from local state
-      setHotels(prev => prev.filter(hotel => hotel._id !== selectedHotel._id));
+      setHotels((prev) =>
+        prev.filter((hotel) => hotel._id !== selectedHotel._id)
+      );
       setShowDeleteModal(false);
       setSelectedHotel(null);
-      
-      toast.success(response.data.message || "Hotel deleted successfully!");
 
+      toast.success(response.data.message || "Hotel deleted successfully!");
     } catch (error) {
-      console.error('Error deleting hotel:', error);
+      console.error("Error deleting hotel:", error);
       toast.error(
-        error.response?.data?.message || error.message || "Failed to delete hotel"
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to delete hotel"
       );
     } finally {
       setLoading(false);
@@ -414,7 +471,7 @@ const counties = [
       image: null,
       imagePreview: hotel.image || null,
       images: [],
-      imagesPreview: hotel.images || []
+      imagesPreview: hotel.images || [],
     });
     setShowEditModal(true);
   };
@@ -428,13 +485,13 @@ const counties = [
   // Toggle availability
   const toggleAvailability = async (hotelId) => {
     try {
-      const hotel = hotels.find(h => h._id === hotelId);
+      const hotel = hotels.find((h) => h._id === hotelId);
       const newAvailability = !hotel.isAvailable;
 
       const response = await axios.put(
         `${backendUrl}/api/hotels/update-hotel/${hotelId}`,
         {
-          isAvailable: newAvailability
+          isAvailable: newAvailability,
         },
         {
           withCredentials: true,
@@ -444,23 +501,31 @@ const counties = [
 
       if (response.data.success) {
         // Update local state
-        setHotels(prev => prev.map(h => 
-          h._id === hotelId ? { ...h, isAvailable: newAvailability } : h
-        ));
+        setHotels((prev) =>
+          prev.map((h) =>
+            h._id === hotelId ? { ...h, isAvailable: newAvailability } : h
+          )
+        );
         toast.success("Hotel availability updated!");
       }
     } catch (error) {
-      console.error('Error updating availability:', error);
+      console.error("Error updating availability:", error);
       toast.error("Failed to update hotel availability");
     }
   };
 
   const getStatusColor = (isAvailable) => {
-    return isAvailable ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
+    return isAvailable
+      ? "bg-green-100 text-green-800"
+      : "bg-red-100 text-red-800";
   };
 
   const getStatusIcon = (isAvailable) => {
-    return isAvailable ? <FaCheckCircle className="h-3 w-3" /> : <FaTimesCircle className="h-3 w-3" />;
+    return isAvailable ? (
+      <FaCheckCircle className="h-3 w-3" />
+    ) : (
+      <FaTimesCircle className="h-3 w-3" />
+    );
   };
 
   return (
@@ -469,11 +534,14 @@ const counties = [
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-800">Hotel Management</h1>
-          <p className="text-gray-600 mt-2">Manage your hotel listings and availability</p>
+          <p className="text-gray-600 mt-2">
+            Manage your hotel listings and availability
+          </p>
         </div>
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
           <p className="text-emerald-700 font-medium">
-            Total Hotels: <span className="text-emerald-800">{hotels.length}</span>
+            Total Hotels:{" "}
+            <span className="text-emerald-800">{hotels.length}</span>
           </p>
         </div>
       </div>
@@ -483,9 +551,11 @@ const counties = [
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Available Hotels</p>
+              <p className="text-sm font-medium text-gray-600">
+                Available Hotels
+              </p>
               <p className="text-2xl font-bold text-gray-800 mt-1">
-                {hotels.filter(hotel => hotel.isAvailable).length}
+                {hotels.filter((hotel) => hotel.isAvailable).length}
               </p>
             </div>
             <div className="p-3 bg-green-100 rounded-xl">
@@ -497,9 +567,11 @@ const counties = [
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Unavailable Hotels</p>
+              <p className="text-sm font-medium text-gray-600">
+                Unavailable Hotels
+              </p>
               <p className="text-2xl font-bold text-gray-800 mt-1">
-                {hotels.filter(hotel => !hotel.isAvailable).length}
+                {hotels.filter((hotel) => !hotel.isAvailable).length}
               </p>
             </div>
             <div className="p-3 bg-red-100 rounded-xl">
@@ -513,7 +585,10 @@ const counties = [
             <div>
               <p className="text-sm font-medium text-gray-600">Total Rooms</p>
               <p className="text-2xl font-bold text-gray-800 mt-1">
-                {hotels.reduce((total, hotel) => total + (hotel.roomsAvailable || 0), 0)}
+                {hotels.reduce(
+                  (total, hotel) => total + (hotel.roomsAvailable || 0),
+                  0
+                )}
               </p>
             </div>
             <div className="p-3 bg-blue-100 rounded-xl">
@@ -525,9 +600,19 @@ const counties = [
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Avg Price/Night</p>
+              <p className="text-sm font-medium text-gray-600">
+                Avg Price/Night
+              </p>
               <p className="text-2xl font-bold text-gray-800 mt-1">
-                Kes {hotels.length > 0 ? Math.round(hotels.reduce((total, hotel) => total + hotel.pricePerNight, 0) / hotels.length) : 0}
+                Kes{" "}
+                {hotels.length > 0
+                  ? Math.round(
+                      hotels.reduce(
+                        (total, hotel) => total + hotel.pricePerNight,
+                        0
+                      ) / hotels.length
+                    )
+                  : 0}
               </p>
             </div>
             <div className="p-3 bg-amber-100 rounded-xl">
@@ -574,7 +659,9 @@ const counties = [
               No hotels found
             </h3>
             <p className="text-gray-400">
-              {searchTerm ? 'Try adjusting your search terms' : 'Start by adding your first hotel'}
+              {searchTerm
+                ? "Try adjusting your search terms"
+                : "Start by adding your first hotel"}
             </p>
           </div>
         ) : (
@@ -604,7 +691,10 @@ const counties = [
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredHotels.map((hotel) => (
-                  <tr key={hotel._id} className="hover:bg-gray-50 transition-colors">
+                  <tr
+                    key={hotel._id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <img
@@ -624,8 +714,12 @@ const counties = [
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{hotel.county}</div>
-                      <div className="text-sm text-gray-500">{hotel.address}</div>
+                      <div className="text-sm text-gray-900">
+                        {hotel.county}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {hotel.address}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       Kes {hotel.pricePerNight}
@@ -688,7 +782,9 @@ const counties = [
                         type="text"
                         required
                         value={newHotel.name}
-                        onChange={(e) => setNewHotel({...newHotel, name: e.target.value})}
+                        onChange={(e) =>
+                          setNewHotel({ ...newHotel, name: e.target.value })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                         placeholder="Enter hotel name"
                       />
@@ -700,7 +796,12 @@ const counties = [
                       </label>
                       <textarea
                         value={newHotel.description}
-                        onChange={(e) => setNewHotel({...newHotel, description: e.target.value})}
+                        onChange={(e) =>
+                          setNewHotel({
+                            ...newHotel,
+                            description: e.target.value,
+                          })
+                        }
                         rows="3"
                         className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 resize-none"
                         placeholder="Hotel description..."
@@ -715,7 +816,9 @@ const counties = [
                         type="text"
                         required
                         value={newHotel.address}
-                        onChange={(e) => setNewHotel({...newHotel, address: e.target.value})}
+                        onChange={(e) =>
+                          setNewHotel({ ...newHotel, address: e.target.value })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                         placeholder="Street address"
                       />
@@ -728,12 +831,16 @@ const counties = [
                       <select
                         required
                         value={newHotel.county}
-                        onChange={(e) => setNewHotel({...newHotel, county: e.target.value})}
+                        onChange={(e) =>
+                          setNewHotel({ ...newHotel, county: e.target.value })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white"
                       >
                         <option value="">Select County</option>
-                        {counties.map(county => (
-                          <option key={county} value={county}>{county}</option>
+                        {counties.map((county) => (
+                          <option key={county} value={county}>
+                            {county}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -748,7 +855,12 @@ const counties = [
                         min="0"
                         step="0.01"
                         value={newHotel.pricePerNight}
-                        onChange={(e) => setNewHotel({...newHotel, pricePerNight: e.target.value})}
+                        onChange={(e) =>
+                          setNewHotel({
+                            ...newHotel,
+                            pricePerNight: e.target.value,
+                          })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                         placeholder="0.00"
                       />
@@ -764,7 +876,12 @@ const counties = [
                       <input
                         type="text"
                         value={newHotel.amenities}
-                        onChange={(e) => setNewHotel({...newHotel, amenities: e.target.value})}
+                        onChange={(e) =>
+                          setNewHotel({
+                            ...newHotel,
+                            amenities: e.target.value,
+                          })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                         placeholder="Free WiFi, Pool, Breakfast, etc. (comma separated)"
                       />
@@ -778,7 +895,12 @@ const counties = [
                         <input
                           type="email"
                           value={newHotel.contactEmail}
-                          onChange={(e) => setNewHotel({...newHotel, contactEmail: e.target.value})}
+                          onChange={(e) =>
+                            setNewHotel({
+                              ...newHotel,
+                              contactEmail: e.target.value,
+                            })
+                          }
                           className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                           placeholder="email@example.com"
                         />
@@ -791,7 +913,12 @@ const counties = [
                         <input
                           type="tel"
                           value={newHotel.contactPhone}
-                          onChange={(e) => setNewHotel({...newHotel, contactPhone: e.target.value})}
+                          onChange={(e) =>
+                            setNewHotel({
+                              ...newHotel,
+                              contactPhone: e.target.value,
+                            })
+                          }
                           className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                           placeholder="+254..."
                         />
@@ -807,7 +934,12 @@ const counties = [
                           type="number"
                           min="1"
                           value={newHotel.roomsAvailable}
-                          onChange={(e) => setNewHotel({...newHotel, roomsAvailable: e.target.value})}
+                          onChange={(e) =>
+                            setNewHotel({
+                              ...newHotel,
+                              roomsAvailable: e.target.value,
+                            })
+                          }
                           className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                         />
                       </div>
@@ -818,7 +950,12 @@ const counties = [
                         </label>
                         <select
                           value={newHotel.isAvailable}
-                          onChange={(e) => setNewHotel({...newHotel, isAvailable: e.target.value})}
+                          onChange={(e) =>
+                            setNewHotel({
+                              ...newHotel,
+                              isAvailable: e.target.value,
+                            })
+                          }
                           className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white"
                         >
                           <option value="true">Available</option>
@@ -836,7 +973,7 @@ const counties = [
                       <div
                         className="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-emerald-400 transition-all duration-200 cursor-pointer"
                         onDragOver={handleDragOver}
-                        onDrop={(e) => handleDrop(e, 'main')}
+                        onDrop={(e) => handleDrop(e, "main")}
                       >
                         <input
                           type="file"
@@ -846,7 +983,10 @@ const counties = [
                           id="hotel-main-image"
                           required
                         />
-                        <label htmlFor="hotel-main-image" className="cursor-pointer">
+                        <label
+                          htmlFor="hotel-main-image"
+                          className="cursor-pointer"
+                        >
                           {newHotel.imagePreview ? (
                             <div className="flex flex-col items-center">
                               <img
@@ -882,7 +1022,7 @@ const counties = [
                       <div
                         className="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-emerald-400 transition-all duration-200 cursor-pointer"
                         onDragOver={handleDragOver}
-                        onDrop={(e) => handleDrop(e, 'additional')}
+                        onDrop={(e) => handleDrop(e, "additional")}
                       >
                         <input
                           type="file"
@@ -892,7 +1032,10 @@ const counties = [
                           id="hotel-additional-images"
                           multiple
                         />
-                        <label htmlFor="hotel-additional-images" className="cursor-pointer">
+                        <label
+                          htmlFor="hotel-additional-images"
+                          className="cursor-pointer"
+                        >
                           <div className="flex flex-col items-center">
                             <FaUpload className="h-8 w-8 text-gray-400 mb-2" />
                             <p className="text-gray-600 font-medium">
@@ -962,8 +1105,8 @@ const counties = [
       )}
 
       {/* Edit Hotel Modal - Similar structure to Add Modal but with existing data */}
-        
-            {showEditModal && selectedHotel && (
+
+      {showEditModal && selectedHotel && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
@@ -982,7 +1125,9 @@ const counties = [
                         type="text"
                         required
                         value={editHotel.name}
-                        onChange={(e) => setEditHotel({...editHotel, name: e.target.value})}
+                        onChange={(e) =>
+                          setEditHotel({ ...editHotel, name: e.target.value })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                         placeholder="Enter hotel name"
                       />
@@ -994,7 +1139,12 @@ const counties = [
                       </label>
                       <textarea
                         value={editHotel.description}
-                        onChange={(e) => setEditHotel({...editHotel, description: e.target.value})}
+                        onChange={(e) =>
+                          setEditHotel({
+                            ...editHotel,
+                            description: e.target.value,
+                          })
+                        }
                         rows="3"
                         className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 resize-none"
                         placeholder="Hotel description..."
@@ -1009,7 +1159,12 @@ const counties = [
                         type="text"
                         required
                         value={editHotel.address}
-                        onChange={(e) => setEditHotel({...editHotel, address: e.target.value})}
+                        onChange={(e) =>
+                          setEditHotel({
+                            ...editHotel,
+                            address: e.target.value,
+                          })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                         placeholder="Street address"
                       />
@@ -1022,12 +1177,16 @@ const counties = [
                       <select
                         required
                         value={editHotel.county}
-                        onChange={(e) => setEditHotel({...editHotel, county: e.target.value})}
+                        onChange={(e) =>
+                          setEditHotel({ ...editHotel, county: e.target.value })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white"
                       >
                         <option value="">Select County</option>
-                        {counties.map(county => (
-                          <option key={county} value={county}>{county}</option>
+                        {counties.map((county) => (
+                          <option key={county} value={county}>
+                            {county}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -1042,7 +1201,12 @@ const counties = [
                         min="0"
                         step="0.01"
                         value={editHotel.pricePerNight}
-                        onChange={(e) => setEditHotel({...editHotel, pricePerNight: e.target.value})}
+                        onChange={(e) =>
+                          setEditHotel({
+                            ...editHotel,
+                            pricePerNight: e.target.value,
+                          })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                         placeholder="0.00"
                       />
@@ -1058,7 +1222,12 @@ const counties = [
                       <input
                         type="text"
                         value={editHotel.amenities}
-                        onChange={(e) => setEditHotel({...editHotel, amenities: e.target.value})}
+                        onChange={(e) =>
+                          setEditHotel({
+                            ...editHotel,
+                            amenities: e.target.value,
+                          })
+                        }
                         className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                         placeholder="Free WiFi, Pool, Breakfast, etc. (comma separated)"
                       />
@@ -1072,7 +1241,12 @@ const counties = [
                         <input
                           type="email"
                           value={editHotel.contactEmail}
-                          onChange={(e) => setEditHotel({...editHotel, contactEmail: e.target.value})}
+                          onChange={(e) =>
+                            setEditHotel({
+                              ...editHotel,
+                              contactEmail: e.target.value,
+                            })
+                          }
                           className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                           placeholder="email@example.com"
                         />
@@ -1085,7 +1259,12 @@ const counties = [
                         <input
                           type="tel"
                           value={editHotel.contactPhone}
-                          onChange={(e) => setEditHotel({...editHotel, contactPhone: e.target.value})}
+                          onChange={(e) =>
+                            setEditHotel({
+                              ...editHotel,
+                              contactPhone: e.target.value,
+                            })
+                          }
                           className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                           placeholder="+254..."
                         />
@@ -1101,7 +1280,12 @@ const counties = [
                           type="number"
                           min="1"
                           value={editHotel.roomsAvailable}
-                          onChange={(e) => setEditHotel({...editHotel, roomsAvailable: e.target.value})}
+                          onChange={(e) =>
+                            setEditHotel({
+                              ...editHotel,
+                              roomsAvailable: e.target.value,
+                            })
+                          }
                           className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
                         />
                       </div>
@@ -1112,7 +1296,12 @@ const counties = [
                         </label>
                         <select
                           value={editHotel.isAvailable}
-                          onChange={(e) => setEditHotel({...editHotel, isAvailable: e.target.value})}
+                          onChange={(e) =>
+                            setEditHotel({
+                              ...editHotel,
+                              isAvailable: e.target.value,
+                            })
+                          }
                           className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white"
                         >
                           <option value="true">Available</option>
@@ -1134,7 +1323,7 @@ const counties = [
                           e.preventDefault();
                           const file = e.dataTransfer.files[0];
                           if (file && file.type.startsWith("image/")) {
-                            setEditHotel(prev => ({
+                            setEditHotel((prev) => ({
                               ...prev,
                               image: file,
                               imagePreview: URL.createObjectURL(file),
@@ -1149,7 +1338,10 @@ const counties = [
                           className="hidden"
                           id="edit-hotel-main-image"
                         />
-                        <label htmlFor="edit-hotel-main-image" className="cursor-pointer">
+                        <label
+                          htmlFor="edit-hotel-main-image"
+                          className="cursor-pointer"
+                        >
                           {editHotel.imagePreview ? (
                             <div className="flex flex-col items-center">
                               <img
@@ -1176,7 +1368,9 @@ const counties = [
                       </div>
                       {selectedHotel.image && !editHotel.imagePreview && (
                         <div className="mt-2">
-                          <p className="text-sm text-gray-600 mb-2">Current Image:</p>
+                          <p className="text-sm text-gray-600 mb-2">
+                            Current Image:
+                          </p>
                           <img
                             src={selectedHotel.image}
                             alt="Current"
@@ -1198,12 +1392,22 @@ const counties = [
                         onDrop={(e) => {
                           e.preventDefault();
                           const files = Array.from(e.dataTransfer.files);
-                          const imageFiles = files.filter(file => file.type.startsWith("image/"));
+                          const imageFiles = files.filter((file) =>
+                            file.type.startsWith("image/")
+                          );
                           if (imageFiles.length > 0) {
-                            const newImages = [...editHotel.images, ...imageFiles];
-                            const newPreviews = [...editHotel.imagesPreview, ...imageFiles.map(file => URL.createObjectURL(file))];
-                            
-                            setEditHotel(prev => ({
+                            const newImages = [
+                              ...editHotel.images,
+                              ...imageFiles,
+                            ];
+                            const newPreviews = [
+                              ...editHotel.imagesPreview,
+                              ...imageFiles.map((file) =>
+                                URL.createObjectURL(file)
+                              ),
+                            ];
+
+                            setEditHotel((prev) => ({
                               ...prev,
                               images: newImages,
                               imagesPreview: newPreviews,
@@ -1219,7 +1423,10 @@ const counties = [
                           id="edit-hotel-additional-images"
                           multiple
                         />
-                        <label htmlFor="edit-hotel-additional-images" className="cursor-pointer">
+                        <label
+                          htmlFor="edit-hotel-additional-images"
+                          className="cursor-pointer"
+                        >
                           <div className="flex flex-col items-center">
                             <FaUpload className="h-8 w-8 text-gray-400 mb-2" />
                             <p className="text-gray-600 font-medium">
@@ -1233,24 +1440,26 @@ const counties = [
                       </div>
 
                       {/* Current Additional Images */}
-                      {selectedHotel.images && selectedHotel.images.length > 0 && (
-                        <div className="mt-4">
-                          <p className="text-sm font-medium text-gray-700 mb-2">
-                            Current Room Images ({selectedHotel.images.length})
-                          </p>
-                          <div className="grid grid-cols-4 gap-2">
-                            {selectedHotel.images.map((image, index) => (
-                              <div key={index} className="relative">
-                                <img
-                                  src={image}
-                                  alt={`Room ${index + 1}`}
-                                  className="h-16 w-16 object-cover rounded-lg"
-                                />
-                              </div>
-                            ))}
+                      {selectedHotel.images &&
+                        selectedHotel.images.length > 0 && (
+                          <div className="mt-4">
+                            <p className="text-sm font-medium text-gray-700 mb-2">
+                              Current Room Images ({selectedHotel.images.length}
+                              )
+                            </p>
+                            <div className="grid grid-cols-4 gap-2">
+                              {selectedHotel.images.map((image, index) => (
+                                <div key={index} className="relative">
+                                  <img
+                                    src={image}
+                                    alt={`Room ${index + 1}`}
+                                    className="h-16 w-16 object-cover rounded-lg"
+                                  />
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
                       {/* New Additional Images Preview */}
                       {editHotel.imagesPreview.length > 0 && (
@@ -1268,7 +1477,9 @@ const counties = [
                                 />
                                 <button
                                   type="button"
-                                  onClick={() => removeEditAdditionalImage(index)}
+                                  onClick={() =>
+                                    removeEditAdditionalImage(index)
+                                  }
                                   className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
                                 >
                                   ×
@@ -1319,8 +1530,9 @@ const counties = [
               Delete Hotel
             </h3>
             <p className="text-gray-600 mb-4">
-              Are you sure you want to delete <strong>"{selectedHotel.name}"</strong>? 
-              This action cannot be undone.
+              Are you sure you want to delete{" "}
+              <strong>"{selectedHotel.name}"</strong>? This action cannot be
+              undone.
             </p>
             <div className="flex gap-3 justify-center">
               <button

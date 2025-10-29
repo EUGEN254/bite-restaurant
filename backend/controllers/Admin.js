@@ -3,6 +3,7 @@ import PopularDishes from "../models/popularDishesSchema.js";
 import User from "../models/userSchema.js";
 import Category from "../models/categorySchema.js";
 import Hotel from "../models/hotelSchema.js";
+import tableSchema from "../models/tableSchema.js";
 
 // adding dish
 const addDish = async (req, res) => {
@@ -388,9 +389,8 @@ const deleteCategory = async (req, res) => {
   }
 };
 
-
 // Add new hotel
- const addHotel = async (req, res) => {
+const addHotel = async (req, res) => {
   try {
     const {
       name,
@@ -402,21 +402,21 @@ const deleteCategory = async (req, res) => {
       contactEmail,
       contactPhone,
       roomsAvailable,
-      isAvailable
+      isAvailable,
     } = req.body;
 
     // Validation
     if (!name || !address || !county || !pricePerNight) {
       return res.status(400).json({
         success: false,
-        message: "Name, address, county, and price are required"
+        message: "Name, address, county, and price are required",
       });
     }
 
     if (!req.files?.image) {
       return res.status(400).json({
         success: false,
-        message: "Hotel main image is required"
+        message: "Hotel main image is required",
       });
     }
 
@@ -424,7 +424,7 @@ const deleteCategory = async (req, res) => {
     if (!user) {
       return res.status(403).json({
         success: false,
-        message: "Not authorized"
+        message: "Not authorized",
       });
     }
 
@@ -433,21 +433,24 @@ const deleteCategory = async (req, res) => {
     if (existingHotel) {
       return res.status(400).json({
         success: false,
-        message: "Hotel with this name already exists"
+        message: "Hotel with this name already exists",
       });
     }
 
     // Upload main image to Cloudinary
-    const mainImageResult = await cloudinary.uploader.upload(req.files.image[0].path, {
-      folder: "hotels"
-    });
+    const mainImageResult = await cloudinary.uploader.upload(
+      req.files.image[0].path,
+      {
+        folder: "hotels",
+      }
+    );
 
     // Upload additional images if provided
     let additionalImages = [];
     if (req.files.images) {
       for (const file of req.files.images) {
         const result = await cloudinary.uploader.upload(file.path, {
-          folder: "hotels/rooms"
+          folder: "hotels/rooms",
         });
         additionalImages.push(result.secure_url);
       }
@@ -456,8 +459,8 @@ const deleteCategory = async (req, res) => {
     // Parse amenities if it's a string
     let amenitiesArray = [];
     if (amenities) {
-      if (typeof amenities === 'string') {
-        amenitiesArray = amenities.split(',').map(item => item.trim());
+      if (typeof amenities === "string") {
+        amenitiesArray = amenities.split(",").map((item) => item.trim());
       } else if (Array.isArray(amenities)) {
         amenitiesArray = amenities;
       }
@@ -475,7 +478,7 @@ const deleteCategory = async (req, res) => {
       contactEmail: contactEmail?.trim() || "",
       contactPhone: contactPhone?.trim() || "",
       roomsAvailable: parseInt(roomsAvailable) || 1,
-      isAvailable: isAvailable === "true" || isAvailable === true
+      isAvailable: isAvailable === "true" || isAvailable === true,
     });
 
     const savedHotel = await newHotel.save();
@@ -483,15 +486,14 @@ const deleteCategory = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Hotel added successfully",
-      hotel: savedHotel
+      hotel: savedHotel,
     });
-
   } catch (error) {
     console.error("Add hotel error:", error);
     res.status(500).json({
       success: false,
       message: "Server error",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -505,15 +507,14 @@ const getAllHotels = async (req, res) => {
       success: true,
       hotels,
       message: "Hotels fetched successfully",
-      count: hotels.length
+      count: hotels.length,
     });
-
   } catch (error) {
     console.error("Get all hotels error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch hotels",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -527,27 +528,26 @@ const getHotelById = async (req, res) => {
     if (!hotel) {
       return res.status(404).json({
         success: false,
-        message: "Hotel not found"
+        message: "Hotel not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      hotel
+      hotel,
     });
-
   } catch (error) {
     console.error("Get hotel by ID error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch hotel",
-      error: error.message
+      error: error.message,
     });
   }
 };
 
 // Update hotel
- const updateHotel = async (req, res) => {
+const updateHotel = async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -560,14 +560,14 @@ const getHotelById = async (req, res) => {
       contactEmail,
       contactPhone,
       roomsAvailable,
-      isAvailable
+      isAvailable,
     } = req.body;
 
     const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(403).json({
         success: false,
-        message: "Not authorized"
+        message: "Not authorized",
       });
     }
 
@@ -575,7 +575,7 @@ const getHotelById = async (req, res) => {
     if (!hotel) {
       return res.status(404).json({
         success: false,
-        message: "Hotel not found"
+        message: "Hotel not found",
       });
     }
 
@@ -583,13 +583,13 @@ const getHotelById = async (req, res) => {
     if (name && name.trim() !== hotel.name) {
       const existingHotel = await Hotel.findOne({
         name: name.trim(),
-        _id: { $ne: id }
+        _id: { $ne: id },
       });
 
       if (existingHotel) {
         return res.status(400).json({
           success: false,
-          message: "Hotel with this name already exists"
+          message: "Hotel with this name already exists",
         });
       }
       hotel.name = name.trim();
@@ -602,14 +602,16 @@ const getHotelById = async (req, res) => {
     if (pricePerNight) hotel.pricePerNight = parseFloat(pricePerNight);
     if (contactEmail !== undefined) hotel.contactEmail = contactEmail.trim();
     if (contactPhone !== undefined) hotel.contactPhone = contactPhone.trim();
-    if (roomsAvailable !== undefined) hotel.roomsAvailable = parseInt(roomsAvailable);
-    if (isAvailable !== undefined) hotel.isAvailable = isAvailable === "true" || isAvailable === true;
+    if (roomsAvailable !== undefined)
+      hotel.roomsAvailable = parseInt(roomsAvailable);
+    if (isAvailable !== undefined)
+      hotel.isAvailable = isAvailable === "true" || isAvailable === true;
 
     // Parse amenities if provided
     if (amenities !== undefined) {
       let amenitiesArray = [];
-      if (typeof amenities === 'string') {
-        amenitiesArray = amenities.split(',').map(item => item.trim());
+      if (typeof amenities === "string") {
+        amenitiesArray = amenities.split(",").map((item) => item.trim());
       } else if (Array.isArray(amenities)) {
         amenitiesArray = amenities;
       }
@@ -626,7 +628,7 @@ const getHotelById = async (req, res) => {
 
       // Upload new main image
       const result = await cloudinary.uploader.upload(req.files.image[0].path, {
-        folder: "hotels"
+        folder: "hotels",
       });
       hotel.image = result.secure_url;
     }
@@ -645,7 +647,7 @@ const getHotelById = async (req, res) => {
       let newImages = [];
       for (const file of req.files.images) {
         const result = await cloudinary.uploader.upload(file.path, {
-          folder: "hotels/rooms"
+          folder: "hotels/rooms",
         });
         newImages.push(result.secure_url);
       }
@@ -657,21 +659,20 @@ const getHotelById = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Hotel updated successfully",
-      hotel: updatedHotel
+      hotel: updatedHotel,
     });
-
   } catch (error) {
     console.error("Update hotel error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to update hotel",
-      error: error.message
+      error: error.message,
     });
   }
 };
 
 // Delete hotel
- const deleteHotel = async (req, res) => {
+const deleteHotel = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -679,7 +680,7 @@ const getHotelById = async (req, res) => {
     if (!user) {
       return res.status(403).json({
         success: false,
-        message: "Not authorized"
+        message: "Not authorized",
       });
     }
 
@@ -687,7 +688,7 @@ const getHotelById = async (req, res) => {
     if (!hotel) {
       return res.status(404).json({
         success: false,
-        message: "Hotel not found"
+        message: "Hotel not found",
       });
     }
 
@@ -709,24 +710,300 @@ const getHotelById = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Hotel deleted successfully",
-      hotelId: id
+      hotelId: id,
     });
-
   } catch (error) {
     console.error("Delete hotel error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to delete hotel",
-      error: error.message
+      error: error.message,
     });
   }
 };
+
+
+//  Add a new table'
+const addTable = async (req, res) => {
+  try {
+    const { name, maxSeats, currentSeats, type, description, price, available } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "Image file is required" });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized",
+      });
+    }
+
+    // Validate seat numbers
+    if (parseInt(currentSeats) > parseInt(maxSeats)) {
+      return res.status(400).json({
+        success: false,
+        message: "Current seats cannot exceed maximum seats"
+      });
+    }
+
+    // Upload image to Cloudinary
+    const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+      folder: "restaurant_tables",
+    });
+
+    // Create new table document
+    const newTable = new tableSchema({
+      name,
+      image: uploadResult.secure_url,
+      maxSeats,
+      currentSeats,
+      type,
+      description,
+      price,
+      available: available ?? true,
+    });
+
+    await newTable.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Table added successfully",
+      table: newTable,
+    });
+  } catch (error) {
+    console.error("Error adding table:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while adding table",
+      error: error.message,
+    });
+  }
+};
+
+// Get all tables
+const getTables = async (req, res) => {
+  try {
+    const tables = await tableSchema.find().sort({ createdAt: -1 });
+    res.status(200).json({
+      success: true,
+      count: tables.length,
+      tables,
+    });
+  } catch (error) {
+    console.error("Error fetching tables:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch tables",
+      error: error.message,
+    });
+  }
+};
+
+// Update table
+const updateTable = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, maxSeats, currentSeats, type, description, price, available } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized",
+      });
+    }
+
+    // Find table
+    const table = await tableSchema.findById(id);
+    if (!table) {
+      return res.status(404).json({
+        success: false,
+        message: "Table not found"
+      });
+    }
+
+    // Validate seat numbers
+    if (parseInt(currentSeats) > parseInt(maxSeats)) {
+      return res.status(400).json({
+        success: false,
+        message: "Current seats cannot exceed maximum seats"
+      });
+    }
+
+    let imageUrl = table.image;
+    
+    // Upload new image if provided
+    if (req.file) {
+      // Delete old image from Cloudinary if exists
+      if (table.image) {
+        const publicId = table.image.split('/').pop().split('.')[0];
+        await cloudinary.uploader.destroy(`restaurant_tables/${publicId}`);
+      }
+      
+      const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+        folder: "restaurant_tables",
+      });
+      imageUrl = uploadResult.secure_url;
+    }
+
+    // Update table
+    const updatedTable = await tableSchema.findByIdAndUpdate(
+      id,
+      {
+        name,
+        image: imageUrl,
+        maxSeats,
+        currentSeats,
+        type,
+        description,
+        price,
+        available,
+      },
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Table updated successfully",
+      table: updatedTable,
+    });
+  } catch (error) {
+    console.error("Error updating table:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while updating table",
+      error: error.message,
+    });
+  }
+};
+
+// Delete table
+const deleteTable = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized",
+      });
+    }
+
+    // Find table
+    const table = await tableSchema.findById(id);
+    if (!table) {
+      return res.status(404).json({
+        success: false,
+        message: "Table not found"
+      });
+    }
+
+    // Delete image from Cloudinary
+    if (table.image) {
+      const publicId = table.image.split('/').pop().split('.')[0];
+      await cloudinary.uploader.destroy(`restaurant_tables/${publicId}`);
+    }
+
+    // Delete table from database
+    await tableSchema.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+      message: "Table deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting table:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while deleting table",
+      error: error.message,
+    });
+  }
+};
+
+// Toggle table availability
+const toggleTableAvailability = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { available } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized",
+      });
+    }
+
+    const table = await tableSchema.findById(id);
+    if (!table) {
+      return res.status(404).json({
+        success: false,
+        message: "Table not found"
+      });
+    }
+
+    const updatedTable = await tableSchema.findByIdAndUpdate(
+      id,
+      { available },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Table ${available ? 'activated' : 'deactivated'} successfully`,
+      table: updatedTable,
+    });
+  } catch (error) {
+    console.error("Error toggling table availability:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while updating table availability",
+      error: error.message,
+    });
+  }
+};
+
+
+
+// get all members
+const getAllMembers = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized",
+      });
+    }
+
+    const users = await User.find().sort({ createdAt: -1 });
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      users,
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
 
 export {
   addDish,
   addHotel,
   getAllHotels,
   updateHotel,
+  addTable,
+  updateTable, 
+  deleteTable, 
+  toggleTableAvailability ,
+  getAllMembers,
+  getTables,
   getHotelById,
   deleteHotel,
   deleteDish,

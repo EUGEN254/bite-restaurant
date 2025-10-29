@@ -12,6 +12,7 @@ import {
   FaShoppingCart,
   FaCalendarAlt,
   FaBox,
+  FaTable,
   FaMoneyBillWave,
   FaHome
 } from "react-icons/fa";
@@ -50,6 +51,11 @@ const Sidebar = ({ onLinkClick }) => {
       name: "HotelManagment", 
       path: "hotels", 
       icon: <FaHome className="text-lg" /> 
+    },
+    { 
+      name: "Add Table", 
+      path: "add-table", 
+      icon: <FaTable className="text-lg" /> 
     },
     { 
       name: "Staff/Customers", 

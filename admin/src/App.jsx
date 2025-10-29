@@ -17,6 +17,7 @@ import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
 import Payments from "./pages/Payments";
 import HotelManagement from "./pages/HotelManagement";
+import Table from "./pages/Table";
 
 // Enhanced protect route wrapper
 const ProtectRoute = ({ children }) => {
@@ -79,6 +80,7 @@ const App = () => {
           <Route path="hotels" element={<HotelManagement/>} />
           <Route path="staff-customers" element={<StaffCustomers/>} />
           <Route path="inventory" element={<Inventory/>} />
+          <Route path="add-table" element={<Table/>} />
           <Route path="analytics" element={<Analytics/>} />
           <Route path="payment" element={<Payments/>} />
           <Route path="settings" element={<Settings/>} />
