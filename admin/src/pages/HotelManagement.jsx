@@ -133,10 +133,6 @@ const HotelManagement = () => {
     }
   };
 
-  useEffect(() => {
-    fetchHotels();
-  }, []);
-
   // Filter hotels based on search
   const filteredHotels = hotels.filter(
     (hotel) =>
@@ -527,6 +523,10 @@ const HotelManagement = () => {
       <FaTimesCircle className="h-3 w-3" />
     );
   };
+
+  useEffect(() => {
+    fetchHotels();
+  }, []);
 
   return (
     <div className="space-y-6">

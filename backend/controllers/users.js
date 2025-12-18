@@ -258,6 +258,6 @@ export const logoutAdmin = async (req, res) => {
   res.clearCookie("token");
   res.status(201).json({
     success: true,
-    message: "Loggod out succesfully",
+    message: "Logged out succesfully",
   });
 };

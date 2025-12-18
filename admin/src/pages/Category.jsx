@@ -41,11 +41,6 @@ const Category = () => {
     imagePreview: null,
   });
 
-  // Fetch categories on component mount
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
   // Filter categories based on search
   const filteredCategories = categories.filter(
     (category) =>
@@ -57,7 +52,7 @@ const Category = () => {
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setNewCategory(prev => ({
+      setNewCategory((prev) => ({
         ...prev,
         image: file,
         imagePreview: URL.createObjectURL(file),
@@ -68,7 +63,7 @@ const Category = () => {
   const handleEditImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setEditCategory(prev => ({
+      setEditCategory((prev) => ({
         ...prev,
         image: file,
         imagePreview: URL.createObjectURL(file),
@@ -85,7 +80,7 @@ const Category = () => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith("image/")) {
-      setNewCategory(prev => ({
+      setNewCategory((prev) => ({
         ...prev,
         image: file,
         imagePreview: URL.createObjectURL(file),
@@ -97,7 +92,7 @@ const Category = () => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith("image/")) {
-      setEditCategory(prev => ({
+      setEditCategory((prev) => ({
         ...prev,
         image: file,
         imagePreview: URL.createObjectURL(file),
@@ -134,32 +129,34 @@ const Category = () => {
       // Update local state
       setCategories(
         categories.map((cat) =>
-          cat.id === selectedCategory.id 
-            ? { 
-                ...cat, 
+          cat.id === selectedCategory.id
+            ? {
+                ...cat,
                 name: editCategory.name,
                 description: editCategory.description,
                 status: editCategory.status,
-                image: response.data.category.image
-              } 
+                image: response.data.category.image,
+              }
             : cat
         )
       );
 
       setShowEditModal(false);
       setSelectedCategory(null);
-      setEditCategory({ 
-        name: "", 
-        description: "", 
+      setEditCategory({
+        name: "",
+        description: "",
         status: "active",
         image: null,
-        imagePreview: null 
+        imagePreview: null,
       });
       toast.success(response.data.message || "Category updated successfully!");
     } catch (error) {
-      console.error('Error updating category:', error);
+      console.error("Error updating category:", error);
       toast.error(
-        error.response?.data?.message || error.message || "Failed to update category"
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to update category"
       );
     } finally {
       setLoading(false);
@@ -188,9 +185,11 @@ const Category = () => {
       setSelectedCategory(null);
       toast.success(response.data.message || "Category deleted successfully!");
     } catch (error) {
-      console.error('Error deleting category:', error);
+      console.error("Error deleting category:", error);
       toast.error(
-        error.response?.data?.message || error.message || "Failed to delete category"
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to delete category"
       );
     } finally {
       setLoading(false);
@@ -216,9 +215,9 @@ const Category = () => {
 
   const toggleStatus = async (categoryId) => {
     try {
-      const category = categories.find(cat => cat.id === categoryId);
+      const category = categories.find((cat) => cat.id === categoryId);
       const newStatus = category.status === "active" ? "inactive" : "active";
-      
+
       const response = await axios.put(
         `${backendUrl}/api/categories/update-category/${categoryId}`,
         {
@@ -234,15 +233,13 @@ const Category = () => {
         // Update local state
         setCategories(
           categories.map((cat) =>
-            cat.id === categoryId
-              ? { ...cat, status: newStatus }
-              : cat
+            cat.id === categoryId ? { ...cat, status: newStatus } : cat
           )
         );
         toast.success("Category status updated!");
       }
     } catch (error) {
-      console.error('Error updating status:', error);
+      console.error("Error updating status:", error);
       toast.error("Failed to update category status");
     }
   };
@@ -260,6 +257,10 @@ const Category = () => {
       <FaTimesCircle className="h-3 w-3" />
     );
   };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -494,7 +495,7 @@ const Category = () => {
                       placeholder="e.g., Appetizers, Main Course"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Description
@@ -531,7 +532,10 @@ const Category = () => {
                         className="hidden"
                         id="category-image"
                       />
-                      <label htmlFor="category-image" className="cursor-pointer">
+                      <label
+                        htmlFor="category-image"
+                        className="cursor-pointer"
+                      >
                         {newCategory.imagePreview ? (
                           <div className="flex flex-col items-center">
                             <img
@@ -665,7 +669,10 @@ const Category = () => {
                         className="hidden"
                         id="edit-category-image"
                       />
-                      <label htmlFor="edit-category-image" className="cursor-pointer">
+                      <label
+                        htmlFor="edit-category-image"
+                        className="cursor-pointer"
+                      >
                         {editCategory.imagePreview ? (
                           <div className="flex flex-col items-center">
                             <img

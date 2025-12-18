@@ -12,14 +12,12 @@ export const AdminContextProvider = (props) => {
   const [categories, setCategories] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
 
- 
   const [newCategory, setNewCategory] = useState({
     name: "",
     description: "",
     status: "active",
   });
   const [loading, setLoading] = useState(false);
-
 
   // Fetch categories function
   const fetchCategories = async () => {
@@ -173,8 +171,10 @@ export const AdminContextProvider = (props) => {
 
   // adding dish
   const addDish = (dish) => setDishes((prev) => [dish, ...prev]);
+
   const removeDish = (id) =>
     setDishes((prev) => prev.filter((s) => s._id !== id));
+
   const updateDish = (id, updatedDish) => {
     setDishes((prev) =>
       prev.map((dish) => (dish._id === id ? { ...dish, ...updatedDish } : dish))

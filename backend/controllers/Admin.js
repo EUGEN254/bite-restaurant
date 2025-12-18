@@ -722,14 +722,23 @@ const deleteHotel = async (req, res) => {
   }
 };
 
-
 //  Add a new table'
 const addTable = async (req, res) => {
   try {
-    const { name, maxSeats, currentSeats, type, description, price, available } = req.body;
+    const {
+      name,
+      maxSeats,
+      currentSeats,
+      type,
+      description,
+      price,
+      available,
+    } = req.body;
 
     if (!req.file) {
-      return res.status(400).json({ success: false, message: "Image file is required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Image file is required" });
     }
 
     const user = await User.findById(req.user._id);
@@ -744,7 +753,7 @@ const addTable = async (req, res) => {
     if (parseInt(currentSeats) > parseInt(maxSeats)) {
       return res.status(400).json({
         success: false,
-        message: "Current seats cannot exceed maximum seats"
+        message: "Current seats cannot exceed maximum seats",
       });
     }
 
@@ -805,7 +814,15 @@ const getTables = async (req, res) => {
 const updateTable = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, maxSeats, currentSeats, type, description, price, available } = req.body;
+    const {
+      name,
+      maxSeats,
+      currentSeats,
+      type,
+      description,
+      price,
+      available,
+    } = req.body;
 
     const user = await User.findById(req.user._id);
     if (!user) {
@@ -820,7 +837,7 @@ const updateTable = async (req, res) => {
     if (!table) {
       return res.status(404).json({
         success: false,
-        message: "Table not found"
+        message: "Table not found",
       });
     }
 
@@ -828,20 +845,20 @@ const updateTable = async (req, res) => {
     if (parseInt(currentSeats) > parseInt(maxSeats)) {
       return res.status(400).json({
         success: false,
-        message: "Current seats cannot exceed maximum seats"
+        message: "Current seats cannot exceed maximum seats",
       });
     }
 
     let imageUrl = table.image;
-    
+
     // Upload new image if provided
     if (req.file) {
       // Delete old image from Cloudinary if exists
       if (table.image) {
-        const publicId = table.image.split('/').pop().split('.')[0];
+        const publicId = table.image.split("/").pop().split(".")[0];
         await cloudinary.uploader.destroy(`restaurant_tables/${publicId}`);
       }
-      
+
       const uploadResult = await cloudinary.uploader.upload(req.file.path, {
         folder: "restaurant_tables",
       });
@@ -897,13 +914,13 @@ const deleteTable = async (req, res) => {
     if (!table) {
       return res.status(404).json({
         success: false,
-        message: "Table not found"
+        message: "Table not found",
       });
     }
 
     // Delete image from Cloudinary
     if (table.image) {
-      const publicId = table.image.split('/').pop().split('.')[0];
+      const publicId = table.image.split("/").pop().split(".")[0];
       await cloudinary.uploader.destroy(`restaurant_tables/${publicId}`);
     }
 
@@ -942,7 +959,7 @@ const toggleTableAvailability = async (req, res) => {
     if (!table) {
       return res.status(404).json({
         success: false,
-        message: "Table not found"
+        message: "Table not found",
       });
     }
 
@@ -954,7 +971,7 @@ const toggleTableAvailability = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `Table ${available ? 'activated' : 'deactivated'} successfully`,
+      message: `Table ${available ? "activated" : "deactivated"} successfully`,
       table: updatedTable,
     });
   } catch (error) {
@@ -966,8 +983,6 @@ const toggleTableAvailability = async (req, res) => {
     });
   }
 };
-
-
 
 // get all members
 const getAllMembers = async (req, res) => {
@@ -992,16 +1007,15 @@ const getAllMembers = async (req, res) => {
   }
 };
 
-
 export {
   addDish,
   addHotel,
   getAllHotels,
   updateHotel,
   addTable,
-  updateTable, 
-  deleteTable, 
-  toggleTableAvailability ,
+  updateTable,
+  deleteTable,
+  toggleTableAvailability,
   getAllMembers,
   getTables,
   getHotelById,

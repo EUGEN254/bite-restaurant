@@ -482,7 +482,8 @@ export const RestaurantContextProvider = (props) => {
         seats: reservation.currentSeats,
       },
       total: calculateReservationTotal(),
-      reservationId: "R" + Math.random().toString(36).substr(2, 9).toUpperCase(),
+      reservationId:
+        "R" + Math.random().toString(36).substr(2, 9).toUpperCase(),
       reservedAt: new Date().toISOString(),
     };
 
